@@ -1,4 +1,5 @@
-.TH "weblint 1.015" 1L "April 96" "Handmade"
+.ds wV 1.017
+.TH "weblint \*(wV" 1L "April 96" "Handmade"
 .de tS
 ..
 .de tE
@@ -165,9 +166,8 @@ Display the version number.
 .tI -version
 Display the version number.
 .tI -todo
-If you have defined the url-get variable,
-then this option pulls down the current ToDo list from the main ftp site,
-else the URL for an online version of the ToDo list is printed.
+This prints out the URL for the online version of the weblint ToDo list.
+This includes known bugs, and requested/planned features.
 .tI -warnings
 List all supported warnings, with warning identifier,
 and whether the warning is enabled.
@@ -193,9 +193,9 @@ The HTML extensions supported by the Netscape browser, version 2.1.
 .tI "Microsoft"
 The HTML extensions supported by Microsoft Internet Explorer, version 2.1.
 .tI "Java"
-.tE
 The extensions supported by Java-enhanced browsers.
 This is the APPLET and PARAM elements.
+.tE
 .LP
 To enable an extension, you can either use the \fB-x\fP command-line
 switch:
@@ -344,6 +344,10 @@ and whether the warning is enabled or disabled by default.
 .iD attribute-format enabled "illegal value for AAA attribute of XXX (...)"
 .iD extension-markup enabled "<...> is extended markup (use '-x <extension>' to allow this)."
 .iD extension-attribute enabled "attribute `...' for <...> is extended markup (use '-x <extension>' to allow this)."
+.iD quote-attribute-value enabled "value for attribute XYZ (xyz-value) of element FOOBAR should be quoted (i.e. XYZ='xyz-value')"
+.iD meta-in-pre enabled "you should use '&gt;' in place of '>', even in a PRE element."
+.iD heading-in-anchor enabled "<A> should be inside <H?>, not <H?> inside <A>."
+.iD title-length enabled "The HTML spec. recommends the TITLE be no longer than 64 characters."
 .wE
 .SH ""
 .SH "TESTSUITE"
@@ -355,10 +359,10 @@ You can run the testsuite with either of the following commands:
     % ./test.pl\s+2\fP
 .fi
 The results are printed to STDERR,
-with a more complete report generated in weblint-test.log.
+with a more complete report generated in test.log.
 .LP
 All tests should pass.
-If any tests fail, please email weblint-test.log to the address given
+If any tests fail, please email test.log to the address given
 in the AUTHOR section below.
 .SH "ENVIRONMENT VARIABLES"
 .tS
@@ -378,23 +382,29 @@ The user's configuration file.  See the section `CONFIGURATION FILE'.
 .SH "SEE ALSO"
 .BR perl(1)
 .SH VERSION
-This man page describes \fIweblint 1.015\fP.
+This man page describes \fIweblint \*(wV\fP.
 .SH AVAILABILITY
 .ft CW
 .ps -2
 .nf
-ftp://ftp.khoral.com/pub/weblint/weblint.tar.gz
-http://www.khoral.com/staff/neilb/weblint.html
+ftp://ftp.cre.canon.co.uk/pub/weblint/weblint.tar.gz
+http://www.cre.canon.co.uk/~neilb/weblint/
 .fi
 .ft P
 .ps +2
 .SH "KNOWN BUGS"
+The list of known bugs can be found on the weblint home page:
+.nf
+
+    http://www.cre.canon.co.uk/~neilb/weblint/todo/
+
+.fi
 Certain versions of Perl have bugs which are triggered by weblint.
 You shouldn't experience problems if you have 4.036, or 5.002.
 .SH AUTHOR
-Neil Bowers, Khoral Research, Inc.
+Neil Bowers, Canon Research Centre Europe
 .br
-neilb@khoral.com
+neilb@cre.canon.co.uk
 .SH CONTRIBUTIONS
 Lots of people have contributed to weblint,
 in the form of suggestions, bug reports, fixes, and contributed code.
@@ -447,4 +457,10 @@ Keith Iosso <a-keithi@microsoft.com>;
 Chris Lambert <lambertc@sharelink.com>;
 Tristan Savatier <tristan@creative.net>;
 Phil Hooper <hooper@bcci.eng.sun.com>;
-Gerald Viers <grviers@csupomona.edu>.
+Gerald Viers <grviers@csupomona.edu>;
+Dean Brissinger <brissing@bvsd.k12.co.us>;
+Dave Schmitt <dschmi1@gl.umbc.edu>;
+John Van Essen <vanes002@maroon.tc.umn.edu>;
+Brandon Bell <brandon@arcs.bcit.bc.ca>;
+Fumio Moriya and Toshiaki Nomura <dsfrsoft@oai6.yk.fujitsu.co.jp>;
+Vincent Lefevre <vlefevre@ens-lyon.fr>.

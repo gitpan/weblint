@@ -1,8 +1,8 @@
 
-			  Weblint, Version 1.015
+			  Weblint, Version 1.017
 
 	Copyright (c) 1994, 1995, 1996 Neil Bowers.  All rights reserved.
-                           Khoral Research, Inc.
+                           Canon Research Centre Europe Ltd.
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the "Artistic License".  You should have received
@@ -63,14 +63,14 @@ Please let me know if it does.
 The manpage (weblint.1) should be installed in a directory where it
 will be picked up by man (e.g., /usr/local/man/man1 on our machines).
 A postscript version of the manpage (weblint.ps) is available at:
-	http://ftp.khoral.com/pub/weblint/weblint.ps
+	ftp://ftp.cre.canon.co.uk/pub/weblint/weblint.ps
 
 Weblint is available via anonymous ftp, either as a gzip'd tar file,
 or zip'd archive:
-	ftp://ftp.khoral.com/pub/weblint/weblint-1.015.tar.gz
-	ftp://ftp.khoral.com/pub/weblint/weblint.zip
+	ftp://ftp.cre.canon.co.uk/pub/weblint/weblint-1.017.tar.gz
+	ftp://ftp.cre.canon.co.uk/pub/weblint/weblint-1.017.zip
 or you can get it from the weblint home page:
-	http://www.khoral.com/staff/neilb/weblint.html
+	http://www.cre.canon.co.uk/~neilb/weblint/
 The home page also includes a list of other ftp sites where you
 can get weblint.
 
@@ -90,16 +90,17 @@ helps when tracking down problems.
 
 I maintain two email lists:
 
-	weblint-announce@khoral.com
+	weblint-announce@cre.canon.co.uk
 		Announcements for new versions of weblint.
 
-	weblint-victims@khoral.com
-		Discussion related to weblint (such as what features
-		should be added), as well as announcements for new
-		versions of weblint, and pre-release testing.
+	weblint-victims@cre.canon.co.uk
+		Discussion related to weblint (such as what features should
+		be added), as well as announcements for new versions of
+		weblint, and pre-release testing.
 
-Email me if you want to be added to either list.
+Email me if you want to be added to either list. You don't need to be
+on both lists.
 
 Neil Bowers
-Khoral Research, Inc.
-<neilb@khoral.com>    http://www.khoral.com/staff/neilb/
+Canon Research Centre Europe
+<neilb@cre.canon.co.uk>    http://www.cre.canon.co.uk/~neilb/

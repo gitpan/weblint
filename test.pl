@@ -8,12 +8,12 @@
 # Copyright (C) 1995,1996 Neil Bowers.  All rights reserved.
 #
 # See README for additional blurb.
-# Bugs, comments, suggestions welcome: neilb@khoral.com
+# Bugs, comments, suggestions welcome: neilb@cre.canon.co.uk
 #
-$VERSION	= '1.008';
+$VERSION	= '1.010';
 ($PROGRAM = $0) =~ s@.*/@@;
-$FILENAME	= 'testfile.html';
-$LOGFILE	= 'weblint-test.log';
+$FILENAME	= 'testfile.htm';
+$LOGFILE	= 'test.log';
 $ENV{WEBLINTRC} = '/dev/null';
 @TMPDIR_OPTIONS	= ('/usr/tmp', '/tmp', '/var/tmp', '/temp');
 
@@ -203,7 +203,7 @@ $ENV{WEBLINTRC} = '/dev/null';
 	    "<BODY BGCOLOR=\"#ffffff\">\n".
 	    "<CENTER>centered text</CENTER>\n".
 	    "<BLINK>blinking text</BLINK>\n".
-	    "<FONT SIZE=+1>larger font size text</FONT>\n".
+	    "<FONT SIZE=\"+1\">larger font size text</FONT>\n".
 	    "</BODY></HTML>",
 	    3, 'extension-attribute',	# BGCOLOR attribute for BODY
 	    4, 'extension-markup',	# one for the opening tag of CENTER
@@ -211,7 +211,6 @@ $ENV{WEBLINTRC} = '/dev/null';
 	    5, 'extension-markup',
 	    5, 'extension-markup',
 	    6, 'extension-markup',
-	    6, 'attribute-format',	# hmm, checking tags of unknown elts?
 	    6, 'extension-markup');
 
 &ExpectOK('Netscape tags *with* Netscape extension enabled', '-x Netscape',
@@ -219,14 +218,14 @@ $ENV{WEBLINTRC} = '/dev/null';
 	    "<BODY BGCOLOR=\"#ffffff\">\n".
 	    "<CENTER>centered text</CENTER>\n".
 	    "<BLINK>blinking text</BLINK>\n".
-	    "<FONT SIZE=+1>larger font size text</FONT>\n".
+	    "<FONT SIZE=\"+1\">larger font size text</FONT>\n".
 	    "</BODY></HTML>");
 
 &ExpectWARN('not allowed to nest FORM elements', '',
 	    "<HTML>\n<HEAD><TITLE>title</TITLE></HEAD>\n".
 	    "<BODY>\n".
-	    "<FORM METHOD=post ACTION=\"http://www.khoral.com/foo\">\n".
-	    "<FORM METHOD=post ACTION=\"http://www.khoral.com/foo\">\n".
+	    "<FORM METHOD=post ACTION=\"http://www.cre.canon.co.uk/foo\">\n".
+	    "<FORM METHOD=post ACTION=\"http://www.cre.canon.co.uk/foo\">\n".
 	    "This is inside the nested form".
 	    "</FORM>\n".
 	    "</FORM></BODY></HTML>",
@@ -446,9 +445,12 @@ $ENV{WEBLINTRC} = '/dev/null';
 	  "<BODY>this is the body</BODY>\n</HTML>");
 
 &ExpectWARN('should use &gt; in place of >', '',
-	    "<HTML>\n<HEAD><TITLE>test</TITLE></HEAD>\n".
-	    "<BODY>text with > instead of &gt;</BODY>\n</HTML>",
-	    3, 'literal-metacharacter');
+	    "<HTML>\n".
+	    "<HEAD><TITLE>test</TITLE></HEAD>\n".
+	    "<BODY>\n".
+	    "text with > instead of &gt;\n".
+	    "</BODY>\n</HTML>",
+	    4, 'literal-metacharacter');
 
 &ExpectOK('IMG element with LOWSRC attribute', '-x Netscape',
 	  "<HTML>\n<HEAD><TITLE>test</TITLE></HEAD>\n".
@@ -546,7 +548,7 @@ $ENV{WEBLINTRC} = '/dev/null';
 &ExpectOK('FORM element with SELECT element which has SIZE attribute', '',
 	  "<HTML>\n<HEAD><TITLE>title</TITLE></HEAD>\n".
 	  "<BODY>\n".
-	  "<FORM METHOD=post ACTION=\"http://www.khoral.com/foo\">\n".
+	  "<FORM METHOD=post ACTION=\"http://www.cre.canon.co.uk/foo\">\n".
 	  "<SELECT NAME=\"foobar\" SIZE=\"50,8\">\n".
 	  "<OPTION>foobar\n".
 	  "</SELECT>\n".
@@ -607,7 +609,7 @@ $ENV{WEBLINTRC} = '/dev/null';
 	  "<TR><TD></TD></TR>\n".
 	  "</TABLE>\n".
 	  "<FONT COLOR=RED FACE=\"Lucida\" SIZE=3>Red lucida text</FONT>\n".
-	  "<MARQUEE BGCOLOR=#FFFFBB DIRECTION=RIGHT BEHAVIOR=SCROLL\n".
+	  "<MARQUEE BGCOLOR=\"#FFFFBB\" DIRECTION=RIGHT BEHAVIOR=SCROLL\n".
 	  "SCROLLAMOUNT=10 SCROLLDELAY=200 WIDTH=\"50%\" HEIGHT=\"50%\"".
 	  "><FONT COLOR=\"WHITE\"\n".
 	  ">This is a scrolling marquee.</FONT></MARQUEE>\n".
@@ -738,6 +740,176 @@ $ENV{WEBLINTRC} = '/dev/null';
 	  "</TABLE>\n".
 	  "</BODY>\n</HTML>");
 
+&ExpectOK('use of percentages in WIDTH attribute', '-x Netscape',
+	  "<HTML>\n".
+	  "<HEAD>\n".
+	  "<TITLE>test</TITLE>\n".
+	  "</HEAD>\n".
+	  "<BODY>\n".
+	  "<TABLE WIDTH=\"100%\">".
+	  "<TR><TH>Bleh</TH><TD>Foobar</TD></TR>\n".
+	  "</TABLE>\n".
+	  "</BODY>\n".
+	  "</HTML>");
+
+&ExpectOK('complicated FRAME example', '-x Netscape',
+	  "<HTML>\n".
+	  "<HEAD>\n".
+	  "        <TITLE>Netscape example</TITLE>\n".
+	  "</HEAD>\n".
+	  "<FRAMESET COLS=\"50%,50%\">\n".
+	  "<NOFRAMES>\n".
+	  "<H1>Title of non-frames version</H1>\n".
+	  "This will be seen if you don't have a FRAME capable browser\n".
+	  "</NOFRAMES>\n".
+	  "\n".
+	  "<FRAMESET ROWS=\"50%,50%\">\n".
+	  "  <FRAME SRC=\"cell.html\"><FRAME SRC=\"cell.html\">\n".
+	  "</FRAMESET>\n".
+	  "<FRAMESET ROWS=\"33%,33%,33%\">\n".
+	  "  <FRAME SRC=\"cell.html\"><FRAME SRC=\"cell.html\">\n".
+	  "<FRAME SRC=\"cell.html\">\n".
+	  "</FRAMESET>\n".
+	  "</FRAMESET>\n".
+	  "</HTML>\n");
+
+&ExpectWARN('unquoted attribute value which should be quoted', '-x Netscape',
+	    "<HTML>\n".
+	    "<HEAD><TITLE>test</TITLE></HEAD>\n".
+	    "<BODY TEXT=#00ffff>\n".
+	    "<TABLE WIDTH=100%>\n".
+	    "<TR><TH>Heading<TD>Datum</TD></TR>\n".
+	    "</TABLE>\n".
+	    "</BODY>\n".
+	    "</HTML>",
+	    3, 'quote-attribute-value',
+	    4, 'quote-attribute-value');
+
+&ExpectWARN('use of > in a PRE element', '',
+	    "<HTML>\n".
+	    "<HEAD><TITLE>test</TITLE></HEAD>\n".
+	    "<BODY>\n".
+	    "<PRE>\n".
+	    "   if (x > y)\n".
+	    "      printf(\"x is greater than y\");\n".
+	    "</PRE>\n".
+	    "</BODY>\n".
+	    "</HTML>",
+	    5, 'meta-in-pre');
+
+&ExpectWARN('heading inside an anchor', '',
+	    "<HTML>\n".
+	    "<HEAD><TITLE>test</TITLE></HEAD>\n".
+	    "<BODY>\n".
+	    "<A NAME=\"foo\"><H2>Bogus heading in anchor</H2></A>\n".
+	    "</BODY>\n".
+	    "</HTML>",
+	    4, 'heading-in-anchor');
+
+&ExpectWARN('TITLE of page is longer then 64 characters', '',
+	    "<HTML>\n".
+	    "<HEAD><TITLE>". ('W' x 65). "</TITLE></HEAD>\n".
+	    "<BODY>\n".
+	    "body of page\n".
+	    "</BODY>\n".
+	    "</HTML>",
+	    2, 'title-length');
+
+&ExpectOK('use of WRAP=HARD in TEXTAREA', '-x Netscape',
+	  "<HTML>\n".
+	  "<HEAD>\n".
+	  "<TITLE>test</TITLE>\n".
+	  "</HEAD>\n".
+	  "<BODY>\n".
+	  "<FORM ACTION=\"foo.html\" METHOD=POST>\n".
+	  "<TEXTAREA NAME=foo ROWS=24 COLS=24 WRAP=HARD>\n".
+	  "hello</TEXTAREA>\n".
+	  "</FORM>\n".
+	  "</BODY>\n".
+	  "</HTML>");
+
+&ExpectOK('use of HEIGHT attribute for TR, TD, and TH', '-x Netscape',
+	  "<HTML>\n".
+	  "<HEAD>\n".
+	  "<TITLE>test</TITLE>\n".
+	  "</HEAD>\n".
+	  "<BODY>\n".
+	  "<TABLE>\n".
+	  "<TR HEIGHT=20><TH HEIGHT=30>Heading<TD HEIGHT=40>datum</TR>\n".
+	  "</TABLE>\n".
+	  "</BODY>\n".
+	  "</HTML>");
+
+&ExpectWARN('empty list items', '',
+	    "<HTML>\n".
+	    "<HEAD><TITLE>test</TITLE></HEAD>\n".
+	    "<BODY>\n".
+	    "<UL>\n".
+	    "<LI>\n".
+	    "<LI>Second item\n".
+	    "<LI>\n".
+	    "<LI>Fourth item\n".
+	    "<LI>\n".
+	    "</UL>\n".
+	    "</BODY>\n".
+	    "</HTML>",
+	    5, 'empty-container',
+	    7, 'empty-container',
+	    9, 'empty-container');
+
+&ExpectOK('IMG with ALT set to empty string', '',
+	  "<HTML>\n".
+	  "<HEAD>\n".
+	  "<TITLE>test</TITLE>\n".
+	  "</HEAD>\n".
+	  "<BODY>\n".
+	  "<IMG SRC=\"foo.gif\" ALT=\"\">\n".
+	  "<IMG SRC=\"foo.gif\" ALT=''>\n".
+	  "</BODY>\n".
+	  "</HTML>");
+
+&ExpectWARN('use of > multiple times in a PRE element', '',
+	    "<HTML>\n".
+	    "<HEAD><TITLE>test</TITLE></HEAD>\n".
+	    "<BODY>\n".
+	    "<PRE>\n".
+	    "   if (x > y)\n".
+	    "      foobar();\n".
+	    "   if (x > z)\n".
+	    "      barfoo();\n".
+	    "</PRE>\n".
+	    "</BODY>\n".
+	    "</HTML>\n",
+	    5, 'meta-in-pre',
+	    7, 'meta-in-pre');
+
+&ExpectWARN("don't check attributes of unknown elements", '',
+	    "<HTML>\n".
+	    "<HEAD><TITLE>test</TITLE></HEAD>\n".
+	    "<BODY>\n".
+	    "Hello, <FONT SIZE=\"+1\">World!</FONT>\n".
+	    "</BODY>\n".
+	    "</HTML>\n",
+	    4, 'extension-markup',
+	    4, 'extension-markup');
+
+&ExpectOK('images with all variants of ALIGN for Netscape', '-x Netscape',
+	  "<HTML>\n".
+	  "<HEAD>\n".
+	  "<TITLE>test</TITLE>\n".
+	  "</HEAD>\n".
+	  "<BODY>\n".
+	  "<IMG SRC=\"foo.gif\" ALT=\"\" ALIGN=LEFT>\n".
+	  "<IMG SRC=\"foo.gif\" ALT=\"\" ALIGN=RIGHT>\n".
+	  "<IMG SRC=\"foo.gif\" ALT=\"\" ALIGN=TOP>\n".
+	  "<IMG SRC=\"foo.gif\" ALT=\"\" ALIGN=TEXTTOP>\n".
+	  "<IMG SRC=\"foo.gif\" ALT=\"\" ALIGN=MIDDLE>\n".
+	  "<IMG SRC=\"foo.gif\" ALT=\"\" ALIGN=ABSMIDDLE>\n".
+	  "<IMG SRC=\"foo.gif\" ALT=\"\" ALIGN=BASELINE>\n".
+	  "<IMG SRC=\"foo.gif\" ALT=\"\" ALIGN=BOTTOM>\n".
+	  "<IMG SRC=\"foo.gif\" ALT=\"\" ALIGN=ABSBOTTOM>\n".
+	  "</BODY>\n".
+	  "</HTML>");
 
 &WeblintTestEnd();
 
@@ -868,7 +1040,7 @@ sub CreateFile
 sub WeblintTestInitialize
 {
    $TMPDIR   = &PickTmpdir(@TMPDIR_OPTIONS);
-   $WORKDIR  = "$TMPDIR/weblint-test.$$";
+   $WORKDIR  = "$TMPDIR/webtest.$$";
    mkdir($WORKDIR, 0755) || do
    {
       die "Failed to create working directory $WORKDIR: $!\n";

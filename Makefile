@@ -1,7 +1,9 @@
 #
 # Makefile for weblint
 #
-VERSION	= 1.015
+VERSION	= 1.017
+
+SHELL	= /bin/sh
 
 BINDIR	= /usr/local/bin
 MANDIR	= /usr/local/man/man1
@@ -50,5 +52,5 @@ zip: clean $(PROGRAM)
 	)
 
 clean:
-	$(RM) *~ $(PSFILE) $(TARFILE) $(TGZ) weblint-test.log $(PROGRAM).zip
+	$(RM) *~ $(PSFILE) $(TARFILE) $(TGZ) test.log $(PROGRAM).zip
 

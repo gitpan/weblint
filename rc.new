@@ -1,38 +1,5 @@
 # ========================================================================
-# New stuff in the 1.015 release
+# New stuff in the 1.017 release
 # ========================================================================
 
-# uncomment the following line if using the Microsoft HTML extensions
-# extension Microsoft
-
-#
-# Weblint supports a local site configuration file.
-# If one is set up, then you can specify it be included with the following:
-#
-#       use global weblintrc
-#
-
-#
-# file-extensions: list of filename extensions for valid HTML filenames
-#                       
-# A comma-separated list of filenames extensions; these are used when
-# recursing in a directory, to decide which files should be checked.
-#
-  
-set file-extensions = html, htm
-
-
-#------------------------------------------------------------------------
-# Warn if using extended markup without an appropriate extension enabled.
-# This warning replaces the 'netscape-markup' warning, and is now generated
-# if the page uses Netscape or Microsoft extensions.
-#------------------------------------------------------------------------
-enable extension-markup
-
-#------------------------------------------------------------------------
-# Warn if using extended attributes without an appropriate extension enabled.
-# This warning replaces the 'netscape-attribute' warning, and is now generated
-# if the page uses Netscape or Microsoft attributes.
-#------------------------------------------------------------------------
-enable extension-attribute
-
+#-- no new warnings or variables added in 1.017

@@ -8,17 +8,16 @@
 # Copyright (C) 1994, 1995, 1996 Neil Bowers.  All rights reserved.
 #
 # See README for additional blurb.
-# Bugs, comments, suggestions welcome: neilb@khoral.com
+# Bugs, comments, suggestions welcome: neilb@cre.canon.co.uk
 #
 # Latest version is available as:
-#	ftp://ftp.khoral.com/pub/weblint/weblint.tar.gz
+#	ftp://ftp.cre.canon.co.uk/pub/weblint/weblint.tar.gz
 #
 
-$VERSION        = '1.015';
+$VERSION        = '1.017';
 ($PROGRAM       = $0) =~ s@.*/@@;
 @TMPDIR_OPTIONS	= ('/usr/tmp', '/tmp', '/var/tmp', '/temp');
 $TMPDIR         = &PickTmpdir(@TMPDIR_OPTIONS);
-$ToDoURL        = 'ftp://ftp.khoral.com/pub/weblint/todo.txt';
 $SITE_DIR       = '';
 $USER_RCFILE    = $ENV{'WEBLINTRC'} || "$ENV{'HOME'}/.weblintrc";
 $SITE_RCFILE	= $SITE_DIR.'/global.weblintrc' if $SITE_DIR;
@@ -34,7 +33,7 @@ $versionString=<<EofVersion;
 
 	Weblint may be used and copied only under the terms of the Artistic
 	License, which may be found in the Weblint source kit, or at:
-        	http://www.khoral.com/staff/neilb/weblint/artistic.html
+        	http://www.cre.canon.co.uk/~neilb/weblint/artistic.html
 EofVersion
 
 
@@ -71,7 +70,7 @@ EofUsage
 #------------------------------------------------------------------------
 $todo=<<EofToDo;
 The Weblint toDo list can be seen at:
-	http://www.khoral.com/staff/neilb/weblint/todo.html
+	http://www.cre.canon.co.uk/~neilb/weblint/todo/
 EofToDo
 
 *WARNING = *STDOUT;
@@ -323,8 +322,9 @@ $colorRE = '#[0-9a-fA-F]{6}';
  'SCRIPT',   'LANGUAGE',
  'TABLE',    'CELLSPACING|CELLPADDING',
  'TEXTAREA', 'WRAP',
- 'TD',       'WIDTH',
- 'TH',       'WIDTH',
+ 'TD',       'WIDTH|HEIGHT',
+ 'TH',       'WIDTH|HEIGHT',
+ 'TR',       'HEIGHT',
  'UL',       'TYPE'
 );
 
@@ -347,9 +347,12 @@ $msElements = 'AREA|BASEFONT|BGSOUND|CENTER|FONT|MAP|MARQUEE|NOBR|WBR';
  'OL',       'START|TYPE',
  'TABLE',    'BGCOLOR|BORDERCOLOR|BORDERCOLORLIGHT|BORDERCOLORDARK|'.
 	     'CELLSPACING|CELLPADDING|VALIGN',
- 'TD',       'BGCOLOR|BORDERCOLOR|BORDERCOLORLIGHT|BORDERCOLORDARK|VALIGN',
- 'TH',       'BGCOLOR|BORDERCOLOR|BORDERCOLORLIGHT|BORDERCOLORDARK|VALIGN',
- 'TR',       'BGCOLOR|BORDERCOLOR|BORDERCOLORLIGHT|BORDERCOLORDARK|VALIGN',
+ 'TD',       'BGCOLOR|BORDERCOLOR|BORDERCOLORLIGHT|BORDERCOLORDARK|VALIGN|'.
+	     'HEIGHT',
+ 'TH',       'BGCOLOR|BORDERCOLOR|BORDERCOLORLIGHT|BORDERCOLORDARK|VALIGN|'.
+	     'HEIGHT',
+ 'TR',       'BGCOLOR|BORDERCOLOR|BORDERCOLORLIGHT|BORDERCOLORDARK|VALIGN|'.
+	     'HEIGHT',
 );
 $msColors = 'Black|White|Green|Maroon|Olive|Navy|Purple|Gray|'.
             'Red|Yellow|Blue|Teal|Lime|Aqua|Fuchsia|Silver';
@@ -360,7 +363,7 @@ $msColors = 'Black|White|Green|Maroon|Olive|Navy|Purple|Gray|'.
  'OVERLAY',  'FIG',
  'HEAD',     'HTML',
  'BODY',     '/HEAD',
- 'FRAMESET', '/HEAD',
+ 'FRAMESET', '/HEAD|/FRAME|/FRAMESET|/NOFRAMES',
  '/HTML',    '/BODY|/FRAMESET',
  );
 
@@ -569,7 +572,7 @@ sub WebLint
    while (<PAGE>)
    {
       $line .= $_;
-      $line =~ s/\n/ /g;
+      # $line =~ s/\n/ /g;
 
       while ($line =~ /</o)
       {
@@ -586,9 +589,19 @@ sub WebLint
 		      $badTextContext{$tags[$#tags]});
 	    }
 
-	    if ($lastNonTag =~ />/)
+	    $lnt = $lastNonTag;
+	    while ($lnt =~ />/o)
 	    {
-	       &whine($., 'literal-metacharacter', '>', '&gt;')
+	       $nl = $lnt = $';
+	       $nl =~ s/[^\n]//go;
+	       if ('PRE' =~ /^($tagRE)$/)
+	       {
+		  &whine($. - length($nl), 'meta-in-pre', '&gt;', '>');
+	       }
+	       else
+	       {
+		  &whine($. - length($nl), 'literal-metacharacter', '>', '&gt;');
+	       }
 	    }
 	 }
 
@@ -616,15 +629,16 @@ sub WebLint
 	 }
 	 undef $commentline;
 
-	 next READLINE unless $tail =~ /^(\s*)([^>]*)>/;
+	 next READLINE unless $tail =~ /^(\s*)([^>]*)>/o;
 
 
 	 &whine($., 'leading-whitespace', $2) if $1 ne '';
 
-         $id = $tag = $2;
          $line = $';
+         ($tag = $2) =~ s/\n/ /go;
+	 $id = $tag;
 
-         &whine($., 'unknown-element', $id),next if $id =~ /^\s*$/;
+         &whine($., 'unknown-element', $id),next if $id =~ /^\s*$/o;
 
 	 # push lastNonTag onto word list for spell checking
 
@@ -643,7 +657,7 @@ sub WebLint
 	 $closing = 0;
          if ($id =~ m@^/@o)
          {
-            $id =~ s@^/@@;
+            $id =~ s@^/@@o;
 	    $ID = "\U$id";
             $closing = 1;
          }
@@ -658,14 +672,14 @@ sub WebLint
 	    {
 	       ($ok=1),last if $pre eq $lastTAG;
 	    }
-	    if (!$ok || $lastNonTag !~ /^\s*$/)
+	    if (!$ok || $lastNonTag !~ /^\s*$/o)
 	    {
 	       &whine($., 'must-follow', $TAG, $mustFollow{$TAG});
 	    }
 	 }
 
 	 #-- catch empty container elements
-	 if ($closing && $ID eq $lastTAG && $lastNonTag =~ /^\s*$/
+	 if ($closing && $ID eq $lastTAG && $lastNonTag =~ /^\s*$/o
 	     && $tagNums[$#tagNums] == ($tagNum - 1)
 	     && $ID ne 'TEXTAREA' && $ID ne 'TD')
 	 {
@@ -676,7 +690,7 @@ sub WebLint
 	 if (!$closing && $ID eq $tags[$#tags] && $lastTAG eq $ID
 	     && $ID =~ /^($maybePaired)$/
 	     && $tagNums[$#tagNums] == ($tagNum - 1)
-	     && $lastNonTag =~ /^\s*$/)
+	     && $lastNonTag =~ /^\s*$/o)
 	 {
 	    $t = pop @tags;
 	    $tline = pop @taglines;
@@ -737,6 +751,11 @@ sub WebLint
                &whine($., 'here-anchor');
             }
 
+	    if ($ID eq 'TITLE' && length($lastNonTag) > 64)
+	    {
+	       &whine($., 'title-length');
+	    }
+
 	    #-- end of HEAD, did we see a TITLE in the HEAD element? ----
 	    &whine($., 'require-head') if $ID eq 'HEAD' && !$seenTag{'TITLE'};
 
@@ -754,18 +773,23 @@ sub WebLint
 	       &whine($., 'physical-font', $ID, $physicalFontElements{$ID});
 	    }
 
+	    if ($ID =~ /^H[1-6]$/o && 'A' =~ /^($tagRE)$/)
+	    {
+	       &whine($., 'heading-in-anchor', $ID);
+	    }
+
             if ($ID eq 'A' && defined $args{'HREF'})
             {
 	       $target = $args{'HREF'};
-               if ($target =~ /([^:]+):\/\/([^\/]+)(.*)$/
-		   || $target =~ /^(news|mailto):/
-		   || $target =~ /^\//)
+               if ($target =~ /([^:]+):\/\/([^\/]+)(.*)$/o
+		   || $target =~ /^(news|mailto):/o
+		   || $target =~ /^\//o)
                {
                }
                else
                {
-		  $target =~ s/#.*$//;
-		  if ($target !~ /^\s*$/ && ! -f $target && ! -d $target)
+		  $target =~ s/#.*$//o;
+		  if ($target !~ /^\s*$/o && ! -f $target && ! -d $target)
 		  {
 		     &whine($., 'bad-link', $target);
 		  }
@@ -856,17 +880,35 @@ sub WebLint
          #--------------------------------------------------------
          if ($ID =~ /^($pairElements)$/o)
          {
+	    if (!$closing && $ID eq $tags[$#tags] &&
+		$ID =~ /^($maybePaired)$/o)
+	    {
+	       pop @tags;
+	       pop @tagNums;
+	       pop @taglines;
+	       $tagRE = join('|',@tags);
+	    }
 	    if ($closing)
 	    {
 	       # trailing whitespace in content of container element
-	       if ($lastNonTag =~ /\S\s+$/ && $ID =~ /^($cuddleContainers)$/)
+	       if ($lastNonTag =~ /\S\s+$/o && $ID =~ /^($cuddleContainers)$/o)
 	       {
 		  &whine($., 'container-whitespace', 'trailing', $ID);
 	       }
 
 	       #-- if we have a closing tag, and the tag(s) on top of the stack
-	       #-- are optional closing tag elements, pop the tag off the stack,
+	       #-- are optional closing tag elements, pop tag off the stack,
 	       #-- unless it matches the current closing tag
+	       if (@tags > 0 && $tags[$#tags] ne $ID
+		   && $tags[$#tags] =~ /^($maybePaired)$/o
+		   && $lastNonTag =~ /^\s*$/o
+		   && $tagNums[$#tagNums] == ($tagNum - 1)
+		   && $ID ne 'TD')
+	       {
+		  $tline = $taglines[$#taglines];
+		  &whine($tline, 'empty-container', $tags[$#tags]);
+	       }
+
 	       while (@tags > 0 && $tags[$#tags] ne $ID
 		      && $tags[$#tags] =~ /^($maybePaired)$/o)
 	       {
@@ -879,7 +921,7 @@ sub WebLint
 	    else
 	    {
 	       # leading whitespace in content of container element
-	       if ($line =~ /^\s+/ && $ID =~ /^($cuddleContainers)$/)
+	       if ($line =~ /^\s+/o && $ID =~ /^($cuddleContainers)$/o)
 	       {
 		  &whine($., 'container-whitespace', 'leading', $ID);
 	       }
@@ -903,7 +945,7 @@ sub WebLint
 			$ttag = pop @tags;
 			pop @tagNums;
 			$ttagline = pop @taglines;
-			if ($ttag !~ /^($maybePaired)$/)
+			if ($ttag !~ /^($maybePaired)$/o)
 			{
 			   &whine($., 'unclosed-element', $ttag, $ttagline);
 			}
@@ -935,7 +977,7 @@ sub WebLint
 	       }
 	       else
 	       {
-                  if ($ID =~ /^H[1-6]$/ && $tags[$#tags] =~ /^H[1-6]$/)
+                  if ($ID =~ /^H[1-6]$/o && $tags[$#tags] =~ /^H[1-6]$/o)
                   {
 		     &whine($., 'heading-mismatch', $tags[$#tags], $ID);
                      &PopEndTag();
@@ -990,7 +1032,7 @@ sub WebLint
       $tag = shift(@tags);
       shift(@tagNums);
       $line = shift(@taglines);
-      if ($tag !~ /^($maybePaired)$/)
+      if ($tag !~ /^($maybePaired)$/o)
       {
 	 &whine($., 'unclosed-element', $tag, $line);
       }
@@ -1024,27 +1066,31 @@ sub CheckAttributes
    {
       ($id,$tail) = ($1,$2);
       $ID = "\U$id";
-      $tail =~ s/\n/ /g;
+
+      # don't worry, or warn, about attributes of unknown elements
+      return unless $ID =~ /^($legalElements)$/io;
+
+      $tail =~ s/\n/ /go;
 
       # check for odd number of quote characters
-      ($quotes = $tail) =~ s/[^"]//g;
+      ($quotes = $tail) =~ s/[^""]//go;
       &whine($., 'odd-quotes', $tag) if length($quotes) % 2 == 1;
 
       $novalue = 0;
       $valid = $validAttributes{$ID};
-      while ($tail =~ /^\s*([^=\s]+)\s*=\s*(.*)$/
+      while ($tail =~ /^\s*([^=\s]+)\s*=\s*(.*)$/o
 	     # catch attributes like ISMAP for IMG, with no arg
-	     || ($tail =~ /^\s*(\S+)(.*)/ && ($novalue = 1)))
+	     || ($tail =~ /^\s*(\S+)(.*)/o && ($novalue = 1)))
       {
 	 $arg = "\U$1";
 	 $rest = $2;
 
-	 &whine($., 'unexpected-open', $tag) if $arg =~ /</;
+	 &whine($., 'unexpected-open', $tag) if $arg =~ /</o;
 
 	 if ($arg !~ /^($valid)$/i && $ID =~ /^($legalElements)$/o)
 	 {
-	    if ($arg =~ /^($netscapeAttributes{$ID})$/i
-                || $arg =~ /^($msAttributes{$ID})$/i)
+	    if ($arg =~ /^($netscapeAttributes{$ID})$/io
+                || $arg =~ /^($msAttributes{$ID})$/io)
 	    {
 	       &whine($., 'extension-attribute', $arg, $id);
 	    }
@@ -1066,18 +1112,27 @@ sub CheckAttributes
 	    $args{$arg} = '';
 	    $tail = $rest;
 	 }
-	 elsif ($rest =~ /^'([^']+)'(.*)$/)
+	 elsif ($rest =~ /^'([^'']+)'(.*)$/o)
          {
 	    &whine($., 'attribute-delimiter', $arg, $ID);
             $args{$arg} = $1;
             $tail = $2;
          }
-	 elsif ($rest =~ /^"([^"]+)"(.*)$/
-		|| $rest =~ /^'([^']+)'(.*)$/
-		|| $rest =~ /^(\S+)(.*)$/)
+	 elsif ($rest =~ /^"([^""]*)"(.*)$/o
+		|| $rest =~ /^'([^'']*)'(.*)$/o)
          {
             $args{$arg} = $1;
             $tail = $2;
+         }
+	 elsif ($rest =~ /^(\S+)(.*)$/o)
+         {
+            $attrValue = $1;
+            $args{$arg} = $attrValue;
+            $tail = $2;
+            if ($attrValue =~ /[^-.A-Za-z0-9]/o)
+            {
+               &whine($., 'quote-attribute-value', $arg, $attrValue, $ID);
+            }
          }
          else
          {
@@ -1125,7 +1180,7 @@ sub whine
    return unless $enabled{$id};
    $exit_status = 1;
    (print "$filename:$line:$id\n"), return             if $mstyle eq 'terse';
-   (eval "print \"$filename($line): $message{$id}\n\""), return if $mstyle eq 'lint';
+   (eval "print \"\$filename($line): $message{$id}\n\""), return if $mstyle eq 'lint';
    (eval "print \"line $line: $message{$id}\n\""), return if $mstyle eq 'short';
 
    die "Unknown message style `$mstyle'\n";
@@ -1178,7 +1233,7 @@ sub ReadConfigFile
 	    $arglist = $';
 	 }
       }
-      elsif (/^\s*set\s+(\S+)\s*=\s*(.*)/)
+      elsif (/^\s*set\s+(\S+)\s*=\s*(.*)/o)
       {
          # setting a weblint variable
          if (defined $variable{$1})
@@ -1190,7 +1245,7 @@ sub ReadConfigFile
             print WARNING "Unknown variable `$1' in configuration file\n";
          }
       }
-      elsif (/^\s*use\s*global\s*weblintrc/)
+      elsif (/^\s*use\s*global\s*weblintrc/o)
       {
 	 if (-f $SITE_RCFILE)
 	 {
@@ -1258,7 +1313,7 @@ sub AddExtension
    local(@extlist);
    local($element);
 
-   if ($extension =~ /,/)
+   if ($extension =~ /,/o)
    {
       @extlist = split(/\s*,\s*/, $extension);
       &AddExtension(shift @extlist) while @extlist > 0;
@@ -1368,10 +1423,14 @@ sub AddExtension
       $attributeFormat{'ROWS'} =
 	 $attributeFormat{'COLS'} = '\d+|(\d*[*%]?,)*\d*[*%]?';
 
+      # this is for TEXTAREA
+      $attributeFormat{'WRAP'} .= '|SOFT|HARD';
+
       # attribute format check for attributes which take colors
       $attributeFormat{'ALINK'} = $attributeFormat{'VLINK'} =
       $attributeFormat{'LINK'} = $attributeFormat{'TEXT'} =
       $attributeFormat{'BGCOLOR'} = $colorRE;
+      $attributeFormat{'ALIGN'} .= '|TEXTTOP|ABSMIDDLE|BASELINE|ABSBOTTOM';
 
       # BASE can take just a TARGET attribute, HREF not required therefore
       delete $requiredAttributes{'BASE'};
@@ -1436,9 +1495,8 @@ sub CheckURL
 
 sub PrintToDo
 {
-   die "$todo" unless defined $variable{'url-get'};
-   print "[grabbing weblint todo list - $ToDoURL]\n";
-   system("$variable{'url-get'} $ToDoURL");
+   print STDERR "$todo";
+   exit 0;
 }
 
 #========================================================================
@@ -1677,3 +1735,15 @@ bad-text-context
 attribute-format
 	ENABLE
 	illegal value for $argv[0] attribute of $argv[1] ($argv[2])
+quote-attribute-value
+	ENABLE
+	value for attribute $argv[0] ($argv[1]) of element $argv[2] should be quoted (i.e. $argv[0]="$argv[1]")
+meta-in-pre
+	ENABLE
+	you should use '$argv[0]' in place of '$argv[1]', even in a PRE element.
+heading-in-anchor
+	ENABLE
+	<A> should be inside <$argv[0]>, not <$argv[0]> inside <A>.
+title-length
+	ENABLE
+	The HTML spec. recommends the TITLE be no longer than 64 characters.

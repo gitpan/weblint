@@ -1,79 +1,48 @@
 
-Weblint 1.015 is now available:
+Weblint 1.017 is now available:
 
-        http://www.khoral.com/staff/neilb/weblint.html
-        ftp://ftp.khoral.com/pub/weblint/weblint-1.015.tar.gz
-        ftp://ftp.khoral.com/pub/weblint/weblint.zip
+        http://www.cre.canon.co.uk/~neilb/weblint/
+        ftp://ftp.cre.canon.co.uk/pub/weblint/weblint-1.017.tar.gz
+        ftp://ftp.cre.canon.co.uk/pub/weblint/weblint-1.017.zip
 
 Weblint is a syntax and minimal style checker for HTML: a Perl script which
 picks fluff off HTML pages, much in the same way traditional lint picks fluff
 off C programs.
 
+This is probably the last release before weblint 2.000, which will require
+Perl 5. Suggestions and ideas for weblint 2.000 would be appreciated.
+
 Changes are summarized below, see the ChangeLog file in the distribution for
 more detail.
 
-As ever, I would like to thank everyone who has contributed to this release,
+Thanks to those who contributed to this release,
 neilb
 
-			Changes in Weblint 1.015
+			Changes in Weblint 1.017
 
 
-    *	New extension `Microsoft' -- the HTML extensions supported
-	by Internet Explorer.
+    *	Added a link to the Japanese weblint gateway, by Masayasu Ishikawa.
+		http://www.aichi-u.ac.jp/~mimasa/jweblint/
 
-    *	Local site configuration file now supported. You have to set the
+    *	Added a link to Jim Carpenter's weblint gateway:
+		http://www.tiac.net/users/zach1/htmlcheck/htmlcheck.shtml
 
-		$SITE_DIR
+    *	Added support for missing values of ALIGN when in the IMG
+	element: TEXTTOP, ABSMIDDLE, BASELINE, ABSBOTTOM.
 
-	variable to a directory which contains a file "global.weblintrc".
-	There will be configuration support in later releases.
+    *	Weblint now won't generate warnings for attributes of unknown elements;
+	this includes extended markup, when the relevant extension is not
+	enabled.
 
-    *	If you have a personal configuration file, you can include the
-	local site configuration settings with the sequence:
+    *	You now get multiple warnings if '>' occurs multiple times,
+	where it should be represted as &gt;.
 
-		use global weblintrc
+    *	Fixed the problem where warnings about use of literal '>' would
+	often give the wrong line number.
 
-    *	Changed the 'netscape-markup' warning to a more generic
-	'extension-markup' warning, and the 'netscape-attribute' warning
-	to a more generic 'extension-attribute' warning. The same warning
-	is generated if you use Netscape markup, or Microsoft markup.
+    *	Re-organized the weblint web pages, and added a page with information
+	on supported platforms: Unix, NT, Mac, OS/2.
 
-    *	new configuration variable 'file-extensions', for list of filename
-	extensions when recursing in directories. Defaults to "html, htm".
-
-    *	now warn about leading whitespace in list items.
-
-    *	Attribute format checks added:
-
-	    ATTRIBUTE		VALUES
-	    ---------		-------------------------------------------
-	    CLEAR		LEFT, RIGHT, ALL
-	    TYPE		DISC, CIRCLE, SQUARE, A, a, I, i, 1 (added)
-	    <color attributes>	Color attributes are now checked for hex
-				color values. For Microsoft, color names are
-				also supported. Color attributes are: BGCOLOR,
-				ALINK, VLINK, LINK, TEXT, COLOR, BORDERCOLOR,
-				BORDERCOLORLIGHT, and BORDERCOLORDARK.
-
-    *	FONT and BASE elements now expected to have at least one attribute.
-
-    *	Weblint is now smarter about picking a temporary working directory.
-
-    *   Fixed the attribute format code so the ROWS and COLS attributes
-        for FRAMESET are supported when the Netscape extension is enabled.
-
-    *	Fixed bug where setting the `url-get' variable in your config file
-	would not be seen when using the -todo switch.
-
-    *	The ID, LANG, and CLASS attributes are now recognized for all font
-	elements (B, I, STRONG, EM, etc).
-
-    *	-f command-line switch added, for providing a config file.
-
-    *	Weblint now warns about illegal syntax in the config file.
-	Previously it would be silently ignored.
-
-    *	Weblint now lets you have empty TD elements in a table.
-
-    *	Fixed some typos in the man page.
+    *	I had accidentally deleted the section in weblintrc for things added
+	in the 1.015 release. I put them back.
 

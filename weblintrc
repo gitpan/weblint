@@ -1,6 +1,6 @@
 #
 # sample configuration file for weblint
-# distributed as part of weblint 1.015
+# distributed as part of weblint 1.017
 #
 # The settings in this file reflect the built-in defaults.
 # I.e. if a warning is enabled in this file, then it is enabled by
@@ -174,7 +174,7 @@ enable required-context
 
 #------------------------------------------------------------------------
 # Check for mailto: LINK in header;  for example:
-#	<LINK REV=MADE HREF="mailto:neilb@khoral.com">
+#	<LINK REV=MADE HREF="mailto:neilb@cre.canon.co.uk">
 # This lets at least lynx users comment on a page.
 #------------------------------------------------------------------------
 disable mailto-link
@@ -271,7 +271,7 @@ enable repeated-attribute
 
 #------------------------------------------------------------------------
 # Warn against use of ' as a delimiter for attribute values.  E.g.:
-#	<A HREF='http://www.khoral.com/'>KRI</A>
+#	<A HREF='http://www.cre.canon.co.uk/'>Canon Research Centre</A>
 #------------------------------------------------------------------------
 enable attribute-delimiter
 
@@ -351,9 +351,9 @@ enable bad-text-context
 enable attribute-format
 
 # ========================================================================
-# Warnings added in the 1.015 release
-#	NOTE: the netscape-markup and netscape-attribute warnings
-#		were deleted with the 1.015 release
+# Warnings added in the 1.015 release  
+#       NOTE: the netscape-markup and netscape-attribute warnings
+#               were deleted with the 1.015 release
 # ========================================================================
 
 # uncomment the following line if using the Microsoft HTML extensions
@@ -365,11 +365,47 @@ enable attribute-format
 # if the page uses Netscape or Microsoft extensions.
 #------------------------------------------------------------------------
 enable extension-markup
-
+ 
 #------------------------------------------------------------------------
 # Warn if using extended attributes without an appropriate extension enabled.
 # This warning replaces the 'netscape-attribute' warning, and is now generated
 # if the page uses Netscape or Microsoft attributes.
 #------------------------------------------------------------------------
 enable extension-attribute
+
+
+# ========================================================================
+# New stuff in the 1.016 release
+# ========================================================================
+
+#------------------------------------------------------------------------
+# Warn of the document TITLE is longer than 64 characters.
+# This limit is recommended by the HTML specification
+#------------------------------------------------------------------------
+enable title-length
+
+#------------------------------------------------------------------------
+# Warn about a heading inside an anchor. Should be the other way round;
+# i.e. an anchor inside a heading.
+#------------------------------------------------------------------------
+enable heading-in-anchor
+
+#------------------------------------------------------------------------
+# Warn about use of < inside the PRE element. This is just a special
+# case of the `literal-metacharacter' warning.
+#------------------------------------------------------------------------
+enable meta-in-pre
+
+#------------------------------------------------------------------------
+# Warn about attribute values which should be quoted, but aren't.
+# Attribute values should be quoted if they contain characters
+# other than [-.A-Za-z0-9]
+#------------------------------------------------------------------------
+enable quote-attribute-value
+
+# ========================================================================
+# New stuff in the 1.017 release
+# ========================================================================
+
+#-- no new warnings or variables added in 1.017 
 
