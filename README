@@ -1,8 +1,7 @@
 
-			  Weblint, Version 1.017
+			  Weblint, Version 1.019
 
-	Copyright (c) 1994, 1995, 1996 Neil Bowers.  All rights reserved.
-                           Canon Research Centre Europe Ltd.
+    Copyright (c) 1994, 1995, 1996, 1997 Neil Bowers.  All rights reserved.
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the "Artistic License".  You should have received
@@ -23,6 +22,7 @@ Warnings are generated a la lint -- <filename>(line #): <warning>. E.g.:
 
 Weblint includes the following features:
 
+    *	by default checks for HTML 3.2 (Wilbur)
     *	46 different checks and warnings
     *	Warnings can be enabled/disabled individually, as per your preference
     *	basic structure and syntax checks
@@ -36,8 +36,7 @@ Weblint includes the following features:
     *	stylistic checks
     *	checks for html which is not portable across all browsers
     *	flags markup embedded in comments, since this can confuse some browsers
-    *	support for Netscape, Java, and Microsoft HTML extensions
-    *	HTML 3 elements such as TABLE, MATH, and FIG are supported
+    *	support for Netscape (v4), and Microsoft (v4) HTML extensions
 
 All warnings can be enabled or disabled, using a configuration file,
 $HOME/.weblintrc.  A sample configuration file, weblintrc, is included
@@ -50,7 +49,7 @@ See the man page for details.
 Installation
 
 NOTE:	Certain versions of perl have bugs which are triggered by weblint.
-	You shouldn't experience problems if you have 4.036, or 5.002.
+	You shouldn't experience problems if you have 4.036, or 5.004.
 
 A simple Makefile is provided, in which you may want to modify BINDIR
 and MANDIR, which specify where the weblint script and manpage should
@@ -67,8 +66,8 @@ A postscript version of the manpage (weblint.ps) is available at:
 
 Weblint is available via anonymous ftp, either as a gzip'd tar file,
 or zip'd archive:
-	ftp://ftp.cre.canon.co.uk/pub/weblint/weblint-1.017.tar.gz
-	ftp://ftp.cre.canon.co.uk/pub/weblint/weblint-1.017.zip
+	ftp://ftp.cre.canon.co.uk/pub/weblint/weblint-1.019.tar.gz
+	ftp://ftp.cre.canon.co.uk/pub/weblint/weblint-1.019.zip
 or you can get it from the weblint home page:
 	http://www.cre.canon.co.uk/~neilb/weblint/
 The home page also includes a list of other ftp sites where you
@@ -80,7 +79,7 @@ Run the testsuite with either of the following commands:
 	% make test
 	% ./test.pl
 
-If any of the tests fail, please mail the logfile (weblint-test.log) to me.
+If any of the tests fail, please mail the logfile (test.log) to me.
 
 --------------------------------------------------------------------------
 

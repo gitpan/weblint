@@ -5,7 +5,7 @@
 #
 # weblint - pick fluff off WWW pages (html).
 #
-# Copyright (C) 1994, 1995, 1996 Neil Bowers.  All rights reserved.
+# Copyright (C) 1994, 1995, 1996, 1997 Neil Bowers.  All rights reserved.
 #
 # See README for additional blurb.
 # Bugs, comments, suggestions welcome: neilb@cre.canon.co.uk
@@ -14,7 +14,7 @@
 #	ftp://ftp.cre.canon.co.uk/pub/weblint/weblint.tar.gz
 #
 
-$VERSION        = '1.017';
+$VERSION        = '1.019';
 ($PROGRAM       = $0) =~ s@.*/@@;
 @TMPDIR_OPTIONS	= ('/usr/tmp', '/tmp', '/var/tmp', '/temp');
 $TMPDIR         = &PickTmpdir(@TMPDIR_OPTIONS);
@@ -29,7 +29,7 @@ $SITE_RCFILE	= $SITE_DIR.'/global.weblintrc' if $SITE_DIR;
 $versionString=<<EofVersion;
 	This is weblint, version $VERSION
 
-	Copyright 1994,1995,1996 Neil Bowers
+	Copyright 1994,1995,1996,1997 Neil Bowers
 
 	Weblint may be used and copied only under the terms of the Artistic
 	License, which may be found in the Weblint source kit, or at:
@@ -76,19 +76,17 @@ EofToDo
 *WARNING = *STDOUT;
 
 # obsolete tags
-$obsoleteTags = 'PLAINTEXT|XMP|LISTING|COMMENT';
+$obsoleteTags = 'PLAINTEXT|XMP|LISTING';
 
-$maybePaired  = 'LI|DT|DD|P|ROW|TD|TH|TR';
+$maybePaired  = 'LI|DT|DD|P|TD|TH|TR';
 
-$pairElements = 'A|ABBREV|ABOVE|ACRONYM|ADDRESS|ARRAY|AU|'.
-                'HTML|HEAD|BANNER|BAR|BELOW|BIG|BLOCKQUOTE|BODY|BOX|BQ|BT|'.
-                'CAPTION|CREDIT|DDOT|DEL|DIV|DOT|'.
-                'FIG|FN|H1|H2|H3|H4|H5|H6|HAT|INS|LH|OVERLAY|'.
-		'B|I|U|TT|STRONG|EM|CODE|KBD|VAR|DFN|CITE|SAMP|Q|LANG|'.
+$pairElements = 'A|ADDRESS|APPLET|HTML|HEAD|BIG|BLOCKQUOTE|BODY|CAPTION|DIV|'.
+                'H1|H2|H3|H4|H5|H6|CENTER|FONT|MAP|FONT|'.
+		'B|I|U|TT|STRONG|EM|CODE|KBD|VAR|DFN|CITE|SAMP|'.
 		'UL|OL|DL|'.
-                'MATH|MENU|DIR|FORM|NOTE|PERSON|ROOT|'.
-                'S|SELECT|SMALL|SQRT|STRIKE|STYLE|'.
-                'SUB|SUP|T|TABLE|TEXT|TEXTAREA|TILDE|TITLE|VEC|CODE|PRE|'.
+                'MENU|DIR|FORM|SCRIPT|'.
+                'SELECT|SMALL|STRIKE|STYLE|'.
+                'SUB|SUP|TABLE|TEXT|TEXTAREA|TITLE|CODE|PRE|'.
                 $maybePaired.'|'.
                 $obsoleteTags;
 
@@ -98,10 +96,8 @@ $cuddleContainers = 'A|H1|H2|H3|H4|H5|H6|TITLE|LI';
 # expect to see these tags only once
 %onceOnly = ('HTML', 1, 'HEAD', 1, 'BODY', 1, 'TITLE', 1);
 
-@fontElements = ('EM', 'CITE', 'STRONG', 'CODE', 'SAMP', 'KBD', 'VAR',
-		 'DFN', 'Q', 'LANG', 'AU', 'PERSON', 'ACRONYM', 'ABBREV',
-		 'INS', 'DEL',
-		 'B', 'I', 'TT', 'U', 'S', 'BIG', 'SMALL', 'SUB', 'SUP');
+@fontElements = ('TT', 'I', 'B', 'U', 'STRIKE', 'BIG', 'SMALL', 'SUB', 'SUP',
+		 'EM', 'STRONG', 'DFN', 'CODE', 'SAMP', 'KBD', 'VAR', 'CITE');
 
 %physicalFontElements =
 (
@@ -113,49 +109,25 @@ $cuddleContainers = 'A|H1|H2|H3|H4|H5|H6|TITLE|LI';
 # expect these tags to have attributes
 # these are elements which have no required attributes, but we expect to
 # see at least one of the attributes
-$expectArgsRE = 'A';
+$expectArgsRE = 'A|FONT';
 
 # these tags can only appear in the head element
 $headTagsRE = 'TITLE|NEXTID|LINK|BASE|META';
 
 %requiredContext =
 (
- 'ABOVE',     'MATH',
- 'ARRAY',     'MATH',
- 'ATOP',      'BOX',
- 'BAR',       'MATH',
- 'BELOW',     'MATH',
- 'BOX',       'MATH',
- 'BT',        'MATH',
- 'CAPTION',   'TABLE|FIG',
- 'CHOOSE',    'BOX',
+ 'CAPTION',   'TABLE',
  'DD',        'DL',
- 'DDOT',      'MATH',
- 'DOT',       'MATH',
  'DT',        'DL',
- 'HAT',       'MATH',
  'INPUT',     'FORM',
- 'ITEM',      'ROW',
- 'LEFT',      'BOX',
- 'LH',        'DL|OL|UL',
  'LI',        'DIR|MENU|OL|UL',
- 'OF',        'ROOT',
  'OPTION',    'SELECT',
- 'OVER',      'BOX',
- 'OVERLAY',   'FIG',
- 'RIGHT',     'BOX',
- 'ROOT',      'MATH',
- 'ROW',       'ARRAY',
  'SELECT',    'FORM',
- 'SQRT',      'MATH',
- 'T',         'MATH',
  'TD',        'TR',
- 'TEXT',      'MATH',
  'TEXTAREA',  'FORM',
  'TH',        'TR',
- 'TILDE',     'MATH',
  'TR',        'TABLE',
- 'VEC',       'MATH'
+ 'PARAM',    'APPLET',
  );
 
 # these tags are allowed to appear in the head element
@@ -169,119 +141,93 @@ $headTagsRE = 'TITLE|NEXTID|LINK|BASE|META';
 # elements which cannot be nested
 $nonNest = 'A|FORM';
 
-$netscapeElements = 'NOBR|WBR|FONT|FRAME|FRAMESET|NOFRAMES|BASEFONT|BLINK|'.
-                    'CENTER|MAP|AREA|SCRIPT';
-$javaElements = 'APPLET|PARAM';
-
-#
-# This is a regular expression for all legal elements
-# UPDATE: need to remove duplication in legalElements and pairElements
-#
-$legalElements =
-   'A|ABBREV|ABOVE|ACRONYM|ADDRESS|ARRAY|ATOP|AU|'.
-   'B|BANNER|BAR|BASE|BELOW|BIG|BLOCKQUOTE|BODY|BOX|BQ|BR|BT|'.
-   'CAPTION|CHOOSE|CITE|CODE|CREDIT|'.
-   'DD|DDOT|DFN|DEL|DIR|DIV|DL|DOT|DT|'.
-   'EM|FIG|FN|FORM|H1|H2|H3|H4|H5|H6|HAT|HEAD|HR|HTML|'.
-   'I|IMG|INPUT|INS|ISINDEX|ITEM|KBD|'.
-   'LANG|LEFT|LH|LI|LINK|MATH|MENU|META|NEXTID|NOTE|'.
-   'OF|OL|OPTION|OVER|OVERLAY|P|PERSON|PRE|Q|RANGE|RIGHT|ROOT|ROW|'.
-   'SAMP|SELECT|S|SMALL|SQRT|STRIKE|STRONG|STYLE|SUB|SUP|'.
-   'T|TAB|TABLE|TD|TEXT|TEXTAREA|TH|TILDE|TITLE|TR|TT|U|UL|VAR|VEC|'.
-   $obsoleteTags;
-
 # This table holds the valid attributes for elements
 # Where an element does not have an entry, this implies that the element
 # does not take any attributes
 %validAttributes =
    (
-   'A',          'ID|LANG|CLASS|HREF|MD|NAME|SHAPE|TITLE|REL|REV',
-   'ABOVE',      'SYM',
-   'ADDRESS',    'ID|LANG|CLASS|CLEAR|NOWRAP',
-   'ARRAY',      'ALIGN|COLDEF|LDELIM|RDELIM|LABELS',
-   'BANNER',     'ID|LANG|CLASS',
+   'A',          'HREF|NAME|TITLE|REL|REV',
+   'ADDRESS',    0,
+   'APPLET',     'CODEBASE|CODE|ALT|NAME|WIDTH|HEIGHT|ALIGN|HSPACE|VSPACE',
+   'AREA',       'SHAPE|COORDS|HREF|NOHREF|ALT',
    'BASE',       'HREF',
-   'BR',         'ID|LANG|CLASS|CLEAR',
-   'BLOCKQUOTE', 'ID|LANG|CLASS|CLEAR|NOWRAP',
-   'BODY',       'ID|LANG|CLASS|BACKGROUND',
-   'BOX',        'SIZE',
-   'BQ',         'ID|LANG|CLASS|CLEAR|NOWRAP',
-   'BELOW',      'SYM',
-   'CAPTION',    'ID|LANG|CLASS|ALIGN',
-   'CREDIT',     'ID|LANG|CLASS',
-   'DD',         'ID|LANG|CLASS|CLEAR',
-   'DIV',        'ID|LANG|CLASS|ALIGN|NOWRAP|CLEAR',
-   'DL',         'ID|LANG|CLASS|CLEAR|COMPACT',
-   'DT',         'ID|LANG|CLASS|CLEAR',
-   'FIG',        'ID|LANG|CLASS|CLEAR|NOFLOW|SRC|MD|ALIGN|WIDTH|HEIGHT|'.
-                 'UNITS|IMAGEMAP',
-   'FN',         'ID|LANG|CLASS',
-   'FORM',       'ACTION|METHOD|ENCTYPE|SCRIPT',
-   'H1',         'ID|LANG|CLASS|ALIGN|CLEAR|SEQNUM|SKIP|DINGBAT|SRC|MD|NOWRAP',
-   'H2',         'ID|LANG|CLASS|ALIGN|CLEAR|SEQNUM|SKIP|DINGBAT|SRC|MD|NOWRAP',
-   'H3',         'ID|LANG|CLASS|ALIGN|CLEAR|SEQNUM|SKIP|DINGBAT|SRC|MD|NOWRAP',
-   'H4',         'ID|LANG|CLASS|ALIGN|CLEAR|SEQNUM|SKIP|DINGBAT|SRC|MD|NOWRAP',
-   'H5',         'ID|LANG|CLASS|ALIGN|CLEAR|SEQNUM|SKIP|DINGBAT|SRC|MD|NOWRAP',
-   'H6',         'ID|LANG|CLASS|ALIGN|CLEAR|SEQNUM|SKIP|DINGBAT|SRC|MD|NOWRAP',
-   'HR',         'ID|CLASS|CLEAR|SRC|MD',
-   'HTML',       'VERSION|URN|ROLE',
-   'IMG',        'ID|LANG|CLASS|SRC|MD|WIDTH|HEIGHT|UNITS|ALIGN|ALT|ISMAP',
-   'INPUT',      'ID|LANG|CLASS|TYPE|NAME|VALUE|DISABLED|ERROR|CHECKED|SIZE|'.
-                 'MAXLENGTH|MIN|MAX|ACCEPT|SRC|MD|ALIGN',
-   'ITEM',       'ALIGN|COLSPAN|ROWSPAN',
-   'LH',         'ID|LANG|CLASS',
-   'LI',         'ID|LANG|CLASS|CLEAR|SRC|MD|DINGBAT|SKIP',
-   'LINK',       'HREF|REL|REV|URN|TITLE|METHODS',
-   'MATH',       'ID|CLASS|BOX',
+   'BASEFONT',   'SIZE',
+   'BLOCKQUOTE', 0,
+   'BODY',       'BACKGROUND|BGCOLOR|TEXT|LINK|VLINK|ALINK',
+   'BR',         'CLEAR',
+   'CAPTION',    'ALIGN',
+   'CENTER',     0,
+   'DIV',        'ALIGN',
+   'DIR',        'COMPACT',
+   'DD',         0,
+   'DL',         'COMPACT',
+   'DT',         0,
+   'FONT',       'SIZE|COLOR',
+   'FORM',       'ACTION|METHOD|ENCTYPE',
+   'H1',         'ALIGN',
+   'H2',         'ALIGN',
+   'H3',         'ALIGN',
+   'H4',         'ALIGN',
+   'H5',         'ALIGN',
+   'H6',         'ALIGN',
+   'HEAD',       0,
+   'HR',         'ALIGN|NOSHADE|SIZE|WIDTH',
+   'HTML',       'VERSION',
+   'IMG',       'SRC|ALT|ALIGN|HEIGHT|WIDTH|BORDER|HSPACE|VSPACE|USEMAP|ISMAP',
+   'INPUT',      'TYPE|NAME|VALUE|CHECKED|SIZE|MAXLENGTH|SRC|ALIGN',
+   'ISINDEX',    'PROMPT',
+   'LI',         'TYPE|VALUE',
+   'LINK',       'HREF|REL|REV|TITLE',
+   'LISTING',    0,
+   'MAP',        'NAME',
+   'MENU',       'COMPACT',
    'META',       'HTTP-EQUIV|NAME|CONTENT',
-   'NEXTID',     'N',
-   'NOTE',       'ID|LANG|CLASS|CLEAR|SRC|MD',
-   'OL',         'ID|LANG|CLASS|CLEAR|CONTINUE|SEQNUM|COMPACT',
-   'OPTION',     'ID|LANG|CLASS|DISABLED|ERROR|VALUE|SELECTED|SHAPE',
-   'OVERLAY',    'SRC|MD|UNITS|X|Y|WIDTH|HEIGHT',
-   'P',          'ID|LANG|CLASS|ALIGN|CLEAR|NOWRAP',
-   'PRE',        'ID|LANG|CLASS|CLEAR|WIDTH',
-   'RANGE',      'ID|CLASS|FROM|UNTIL',
-   'ROW',        'ALIGN|COLSPAN|ROWSPAN',
-   'SELECT',     'ID|LANG|CLASS|NAME|MULTIPLE|DISABLED|ERROR|SRC|MD|WIDTH|'.
-                 'HEIGHT|UNITS|ALIGN|SIZE',
-   'STYLE',      'NOTATION',
-   'TAB',        'ID|INDENT|TO|ALIGN|DP',
-   'TABLE',      'ID|LANG|CLASS|CLEAR|NOFLOW|ALIGN|UNITS|COLSPEC|DP|WIDTH|'.
-                 'BORDER|NOWRAP',
-   'TD',         'ID|LANG|CLASS|COLSPAN|ROWSPAN|ALIGN|DP|VALIGN|NOWRAP|'.
-                 'AXIS|AXES',
-   'TEXTAREA',   'ID|LANG|CLASS|NAME|ROWS|COLS|DISABLED|ERROR|ALIGN',
-   'TH',         'ID|LANG|CLASS|COLSPAN|ROWSPAN|ALIGN|DP|VALIGN|NOWRAP|'.
-                 'AXIS|AXES',
-   'TR',         'ID|LANG|CLASS|ALIGN|DP|VALIGN|NOWRAP',
-   'UL',         'ID|LANG|CLASS|CLEAR|PLAIN|SRC|MD|DINGBAT|WRAP|COMPACT',
+   'OL',         'TYPE|START|COMPACT',
+   'OPTION',     'SELECTED|VALUE',
+   'P',          'ALIGN',
+   'PARAM',      'NAME|VALUE',
+   'PLAINTEXT',  0,
+   'PRE',        'WIDTH',
+   'SCRIPT',     'LANGUAGE|SRC',
+   'SELECT',     'NAME|SIZE|MULTIPLE',
+   'STYLE',      0,
+   'TABLE',      'ALIGN|WIDTH|BORDER|CELLSPACING|CELLPADDING',
+   'TD',         'NOWRAP|ROWSPAN|COLSPAN|ALIGN|VALIGN|WIDTH|HEIGHT',
+   'TEXTAREA',   'NAME|ROWS|COLS',
+   'TH',         'NOWRAP|ROWSPAN|COLSPAN|ALIGN|VALIGN|WIDTH|HEIGHT',
+   'TITLE',      0,
+   'TR',         'ALIGN|VALIGN',
+   'TT',         0,
+   'UL',         'TYPE|COMPACT',
+   'XMP',        0,
    );
 
 foreach $elt (@fontElements)
 {
-   $validAttributes{$elt} = 'ID|LANG|CLASS';
+   $validAttributes{$elt} = '';
 }
 
 %requiredAttributes =
    (
-   'BASE',     'HREF',
-   'FORM',     'ACTION',
-   'IMG',      'SRC',
-   'LINK',     'HREF',
-   'NEXTID',   'N',
-   'SELECT',   'NAME',
-   'STYLE',    'NOTATION',
-   'TEXTAREA', 'NAME|ROWS|COLS'
+    'BASE',      'HREF',
+    'BASEFONT',  'SIZE',
+    'FORM',      'ACTION',
+    'IMG',       'SRC',
+    'LINK',      'HREF',
+    'NEXTID',    'N',
+    'SELECT',    'NAME',
+    'TEXTAREA',  'NAME|ROWS|COLS'
    );
 
-$colorRE = '#[0-9a-fA-F]{6}';
+$ColorNames = 'Black|White|Green|Maroon|Olive|Navy|Purple|Gray|'.
+            'Red|Yellow|Blue|Teal|Lime|Aqua|Fuchsia|Silver';
+
+$colorRE = '#[0-9a-fA-F]{6}'.'|'.$ColorNames;
 %attributeFormat =
 (
  'ALIGN',     'BOTTOM|MIDDLE|TOP|LEFT|CENTER|RIGHT|JUSTIFY|'.
               'BLEEDLEFT|BLEEDRIGHT|DECIMAL',
- 'BGCOLOR',   $colorRE,
- 'CLEAR',     'LEFT|RIGHT|ALL',
+ 'CLEAR',    'LEFT|RIGHT|ALL|NONE',
  'COLS',      '\d+',
  'COLSPAN',   '\d+',
  'HEIGHT',    '\d+',
@@ -291,80 +237,245 @@ $colorRE = '#[0-9a-fA-F]{6}';
  'ROWS',      '\d+',
  'ROWSPAN',   '\d+',
  'SEQNUM',    '\d+',
- 'SIZE',      '\d+|\d+,\d+',
+ 'SIZE',      '[-+]?\d+|\d+,\d+',
  'SKIP',      '\d+',
- 'TYPE',      'CHECKBOX|HIDDEN|IMAGE|PASSWORD|RADIO|RESET|SUBMIT|TEXT|',
+ 'TYPE',     'CHECKBOX|HIDDEN|IMAGE|PASSWORD|RADIO|RESET|SUBMIT|TEXT|'.
+             '[AaIi1]|disc|square|circle|FILE',
  'UNITS',     'PIXELS|EN',
  'VALIGN',    'TOP|MIDDLE|BOTTOM|BASELINE',
- 'WIDTH',     '\d+',
+ 'WIDTH',     '\d+%?',
  'WRAP',      'OFF|VIRTUAL|PHYSICAL',
  'X',         '\d+',
  'Y',         '\d+'
 );
+$attributeFormat{'ALINK'} = $attributeFormat{'VLINK'} =
+      $attributeFormat{'LINK'} = $attributeFormat{'TEXT'} =
+      $attributeFormat{'BGCOLOR'} = $attributeFormat{'COLOR'} = $colorRE;
 
+#-----------------------------------------------------------------------
+# Where an element appears in this hash, the value replaces that in
+# the validAttributes hash.
+#-----------------------------------------------------------------------
 %netscapeAttributes =
 (
- 'A',        'TARGET',
- 'AREA',     'SHAPE|HREF|COORDS|NOHREF|TARGET',
- 'BASE',     'TARGET',
- 'BASEFONT', 'SIZE',
- 'BODY',     'BGCOLOR|TEXT|LINK|VLINK|ALINK',
- 'FONT',     'COLOR|SIZE',
- 'FORM',     'ENCTYPE|TARGET',
- 'FRAME',    'SRC|NAME|MARGINWIDTH|MARGINHEIGHT|SCROLLING|NORESIZE',
- 'FRAMESET', 'ROWS|COLS',
- 'HR',       'SIZE|WIDTH|ALIGN|NOSHADE',
- 'IMG',      'BORDER|VSPACE|HSPACE|LOWSRC|USEMAP',
- 'ISINDEX',  'PROMPT',
- 'LI',       'TYPE|VALUE',
- 'MAP',      'NAME',
- 'OL',       'TYPE|START',
- 'SCRIPT',   'LANGUAGE',
- 'TABLE',    'CELLSPACING|CELLPADDING',
- 'TEXTAREA', 'WRAP',
- 'TD',       'WIDTH|HEIGHT',
- 'TH',       'WIDTH|HEIGHT',
- 'TR',       'HEIGHT',
- 'UL',       'TYPE'
+ 'A',        'HREF|NAME|TITLE|REL|REV|TARGET|ONCLICK|ONMOUSEOUT|ONMOUSEOVER',
+ 'APPLET',   'ALIGN|ALT|ARCHIVE|CODE|CODEBASE|HEIGHT|HSPACE|MAYSCRIPT|NAME|'.
+             'VSPACE|WIDTH',
+ 'AREA',     'COORDS|HREF|NAME|NOHREF|ONMOUSEOUT|ONMOUSEOVER|SHAPE|TARGET',
+ 'BASE',     'HREF|TARGET',
+ 'BODY',     'ALINK|BACKGROUND|BGCOLOR|LINK|TEXT|ONBLUR|ONFOCUS|ONLOAD|'.
+             'ONUNLOAD|VLINK',
+ 'BLINK',    '',
+ 'EMBED',    'ALIGN|BORDER|FRAMEBORDER|HEIGHT|HIDDEN|HSPACE|NAME|PALETTE|'.
+             'PLUGINSPAGE|SRC|TYPE|VSPACE|WIDTH|.+',
+ 'FONT',     'COLOR|SIZE|FACE',
+ 'FORM',     'ACTION|ENCTYPE|METHOD|NAME|ONRESET|ONSUBMIT|TARGET',
+ 'FRAME',    'BORDERCOLOR|FRAMEBORDER|MARGINHEIGHT|MARGINWIDTH|NAME|NORESIZE|'.
+             'SCROLLING|SRC',
+ 'FRAMESET', 'BORDER|BORDERCOLOR|COLS|FRAMEBORDER|ONBLUR|ONFOCUS|ONLOAD|'.
+             'ONUNLOAD|ROWS',
+ 'ILAYER',   'ID',
+ 'IMG',      'ALIGN|ALT|BORDER|HEIGHT|HSPACE|ISMAP|LOWSRC|NAME|ONABORT|'.
+             'ONERROR|ONLOAD|SRC|USEMAP|VSPACE|WIDTH',
+ 'INPUT',    'ALIGN|CHECKED|MAXLENGTH|NAME|ONBLUR|ONCHANGE|ONCLICK|ONFOCUS|'.
+             'ONSELECT|SIZE|SRC|TYPE|VALUE',
+ 'KEYGEN',   'NAME|CHALLENGE',
+ 'LAYER',    'ID|LEFT|TOP|PAGEX|PAGEY|SRC|Z-INDEX|ABOVE|BELOW|WIDTH|HEIGHT|'.
+             'CLIP|VISIBILITY|BGCOLOR|BACKGROUND|ONMOUSEOVER|ONFOCUS|ONLOAD',
+ 'LINK',     'HREF|REL|REV|TITLE|TYPE',
+ 'MULTICOL', 'COLS|GUTTER|WIDTH',
+ 'NOBR',     0,
+ 'NOEMBED',  0,
+ 'NOFRAMES', 0,
+ 'NOLAYER',  0,
+ 'NOSCRIPT', 0,
+ 'OL',       'TYPE|START|COMPACT',
+ 'S',        0,
+ 'SELECT',   'NAME|MULTIPLE|ONBLUR|ONCHANGE|ONCLICK|ONFOCUS|SIZE',
+ 'SERVER',   0,
+ 'SPACER',   'ALIGN|HEIGHT|SIZE|TYPE|WIDTH',
+ 'SPAN',     'STYLE|CLASS',
+ 'STYLE',    'TYPE',
+ 'TABLE',    'ALIGN|BGCOLOR|BORDER|CELLPADDING|CELLSPACING|COLS|HEIGHT|'.
+             'HSPACE|WIDTH|VSPACE',
+ 'TD',       'ALIGN|BGCOLOR|COLSPAN|NOWRAP|ROWSPAN|VALIGN|WIDTH|HEIGHT',
+ 'TEXTAREA', 'COLS|NAME|ONBLUR|ONCHANGE|ONFOCUS|ONSELECT|ROWS|WRAP',
+ 'TH',       'ALIGN|BGCOLOR|COLSPAN|NOWRAP|ROWSPAN|VALIGN|WIDTH|HEIGHT',
+ 'TR',       'ALIGN|VALIGN|BGCOLOR',
+ 'WBR',      0,
 );
+$netscapePaired = 'BLINK|FRAMESET|LAYER|MULTICOL|NOEMBED|NOFRAMES|NOLAYER|'.
+                  'NOBR|NOSCRIPT|S|SERVER|SPAN|STYLE';
 
-$msElements = 'AREA|BASEFONT|BGSOUND|CENTER|FONT|MAP|MARQUEE|NOBR|WBR';
+$msStdAttrs   = 'CLASS|ID|LANG|LANGUAGE|STYLE|TITLE';
+$msEvents     = 'ONCLICK|ONHELP|ONKEYPRESS|ONMOUSEMOVE|ONMOUSEOVER|'.
+                'ONSELECTSTART|ONDBLCLICK|ONKEYDOWN|ONKEYUP|ONMOUSEDOWN|'.
+                'ONMOUSEOUT|ONMOUSEUP';
+$msFullEvents = 'ONAFTERUPDATE|ONBEFOREUPDATE|ONBLUR|ONFOCUS|ONDRAGSTART|'.
+                'ONRESIZE|ONROWENTER|ONROWEXIT|'.$msEvents,
+$msTextAttrs  = $msStdAttrs.'|'.$msEvents;
 %msAttributes =
 (
- 'AREA',     'SHAPE|HREF|COORDS|NOHREF',
- 'BASEFONT', 'SIZE',
- 'BGSOUND',  'SRC|LOOP',
- 'BODY',     'ALINK|BGCOLOR|BGPROPERTIES|LEFTMARGIN|LINK|TEXT|TOPMARGIN|VLINK',
- 'CAPTION',  'VALIGN',
- 'FONT',     'COLOR|FACE|SIZE',
- 'HR',       'ALIGN|NOSHADE|SIZE|WIDTH',
- 'IMG',      'BORDER|CONTROLS|DYNSRC|HSPACE|LOOP|START|USEMAP|VSPACE',
- 'ISINDEX',  'ACTION|PROMPT',
- 'LI',       'TYPE|VALUE',
- 'MAP',      'NAME',
- 'MARQUEE',  'ALIGN|BEHAVIOR|BGCOLOR|DIRECTION|HEIGHT|HSPACE|LOOP|'.
-             'SCROLLAMOUNT|SCROLLDELAY|VSPACE|WIDTH',
- 'OL',       'START|TYPE',
- 'TABLE',    'BGCOLOR|BORDERCOLOR|BORDERCOLORLIGHT|BORDERCOLORDARK|'.
-	     'CELLSPACING|CELLPADDING|VALIGN',
- 'TD',       'BGCOLOR|BORDERCOLOR|BORDERCOLORLIGHT|BORDERCOLORDARK|VALIGN|'.
-	     'HEIGHT',
- 'TH',       'BGCOLOR|BORDERCOLOR|BORDERCOLORLIGHT|BORDERCOLORDARK|VALIGN|'.
-	     'HEIGHT',
- 'TR',       'BGCOLOR|BORDERCOLOR|BORDERCOLORLIGHT|BORDERCOLORDARK|VALIGN|'.
-	     'HEIGHT',
+ 'A',          'ACCESSKEY|CLASS|DATAFLD|DATASRC|HREF|ID|LANG|LANGUAGE|'.
+               'METHODS|NAME|REL|REV|STYLE|TARGET|TITLE|URN|ONBLUR|'.
+               'ONFOCUS|'.$msEvents,
+ 'ADDRESS',    'CLASS|ID|LANG|LANGUAGE|STYLE|TITLE|'.$msEvents,
+ 'APPLET',     'ALIGN|ALT|CLASS|CODE|CODEBASE|DATAFLD|DATASRC|HEIGHT|HSPACE|'.
+               'ID|NAME|SRC|STYLE|TITLE|VSPACE|WIDTH',
+ 'AREA',       'ALT|CLASS|COORDS|HREF|ID|LANG|LANGUAGE|NOHREF|SHAPE|STYLE|'.
+               'TARGET|TITLE|ONBLUR|ONFOCUS|'.$msEvents,
+ 'B',          $msTextAttrs,
+ 'BASE',       'CLASS|HREF|ID|LANG|TARGET|TITLE',
+ 'BASEFONT',   'CLASS|COLOR|FACE|ID|LANG|SIZE|TITLE',
+ 'BGSOUND',    'BALANCE|CLASS|ID|LANG|LOOP|SRC|TITLE|VOLUME',
+ 'BIG',        $msTextAttrs,
+ 'BLOCKQUOTE', $msTextAttrs,
+ 'BODY',       'ACCESSKEY|ALINK|BACKGROUND|BGCOLOR|BGPROPERTIES|BOTTOMMARGIN|'.
+               'CLASS|ID|LANG|LANGUAGE|LEFTMARGIN|LINK|RIGHTMARGIN|SCROLL|'.
+               'STYLE|TEXT|TITLE|TOPMARGIN|VLINK|ONAFTERUPDATE|'.
+               'ONBEFOREUPDATE|ONBLUR|ONCLICK|ONDBLCLICK|ONDRAGSTART|'.
+               'ONFOCUS|ONHELP|ONKEYDOWN|ONKEYPRESS|ONKEYUP|ONMOUSEDOWN|'.
+               'ONMOUSEMOVE|ONMOUSEOUT|ONMOUSEOVER|ONMOUSEUP|ONRESIZE|'.
+               'ONROWENTER|ONROWEXIT|ONSCROLL|ONSELECTSTART',
+ 'BR',         'CLASS|CLEAR|ID|LANG|LANGUAGE|STYLE|TITLE',
+ 'BUTTON',     'ACCESSKEY|CLASS|DATAFLD|DATAFORMATAS|DATASRC|DISABLED|'.
+               'ID|LANG|LANGUAGE|STYLE|TITLE|TYPE|ONAFTERUPDATE|'.
+               'ONBEFOREUPDATE|ONBLUR|ONFOCUS|ONDRAGSTART|ONRESIZE|'.
+               'ONROWENTER|ONROWEXIT|'.$msEvents,
+ 'CAPTION',    'ALIGN|CLASS|ID|LANG|LANGUAGE|STYLE|TITLE|VALIGN|'.
+               'ONAFTERUPDATE|ONBEFOREUPDATE|ONBLUR|ONFOCUS|'.
+               'ONDRAGSTART|ONRESIZE|ONROWENTER|ONROWEXIT|'.$msEvents,
+ 'CENTER',     $msTextAttrs,
+ 'CITE',       $msTextAttrs,
+ 'CODE',       $msTextAttrs,
+ 'COL',        'ALIGN|CLASS|ID|SPAN|STYLE|TITLE|VALIGN|WIDTH',
+ 'COLGROUP',   'ALIGN|CLASS|ID|SPAN|STYLE|TITLE|VALIGN|WIDTH',
+ 'COMMENT',    'ID|LANG|TITLE',
+ 'DD',         $msTextAttrs,
+ 'DFN',        $msTextAttrs,
+ 'DIR',        $msTextAttrs,
+ 'DIV',        'ALIGN|CLASS|DATAFLD|DATAFORMATAS|DATASRC|ID|LANG|'.
+               'LANGUAGE|STYLE|TITLE|'.$msFullEvents,
+ 'DL',         $msTextAttrs,
+ 'DT',         $msTextAttrs,
+ 'EM',         $msTextAttrs,
+ 'EMBED',      'ALIGN|ALT|CLASS|CODE|CODEBASE|HEIGHT|HSPACE|ID|NAME|SRC|'.
+               'STYLE|TITLE|VSPACE|WIDTH',
+ 'FIELDSET',   $msTextAttrs,
+ 'FONT',       'CLASS|COLOR|FACE|ID|LANG|LANGUAGE|SIZE|STYLE|TITLE|'.
+               $msEvents,
+ 'FORM',       'ACTION|CLASS|ENCTYPE|ID|LANG|LANGUAGE|METHOD|NAME|STYLE|'.
+               'TARGET|TITLE|ONSUBMIT|'.$msEvents,
+ 'FRAME',      'BORDERCOLOR|CLASS|DATAFLD|DATASRC|FRAMEBORDER|HEIGHT|ID|'.
+               'LANG|LANGUAGE|MARGINHEIGHT|MARGINWIDTH|NAME|NORESIZE|'.
+               'SCROLLING|SRC|TITLE|WIDTH|ONREADYSTATECHANGE',
+ 'FRAMESET',   'BORDER|BORDERCOLOR|CLASS|COLS|FRAMEBORDER|FRAMESPACING|'.
+               'ID|LANG|LANGUAGE|ROWS|TITLE',
+ 'HEAD',       'CLASS|ID|TITLE',
+ 'H1',         'ALIGN|'.$msTextAttrs,
+ 'H2',         'ALIGN|'.$msTextAttrs,
+ 'H3',         'ALIGN|'.$msTextAttrs,
+ 'H4',         'ALIGN|'.$msTextAttrs,
+ 'H5',         'ALIGN|'.$msTextAttrs,
+ 'H6',         'ALIGN|'.$msTextAttrs,
+ 'HR',         'ALIGN|CLASS|COLOR|ID|LANG|LANGUAGE|NOSHADE|SIZE|SRC|STYLE|'.
+               'TITLE|WIDTH|'.$msFullEvents,
+ 'HTML',       'TITLE',
+ 'I',          $msTextAttrs,
+ 'IFRAME',     'ALIGN|BORDER|BORDERCOLOR|CLASS|DATAFLD|DATASRC|FRAMEBORDER|'.
+               'FRAMESPACING|HEIGHT|HSPACE|ID|LANG|LANGUAGE|MARGINHEIGHT|'.
+               'MARGINWIDTH|NAME|NORESIZE|SCROLLING|SRC|STYLE|TITLE|VSPACE|'.
+               'WIDTH|ONREADYSTATECHANGE',
+ 'IMG',        'ALIGN|ALT|BORDER|CLASS|DATAFLD|DATASRC|DYNSRC|HEIGHT|HSPACE|'.
+               'ID|ISMAP|LANG|LANGUAGE|LOOP|LOWSRC|NAME|SRC|STYLE|TITLE|'.
+               'USEMAP|VSPACE|WIDTH|ONABORT|'.$msFullEvents,
+ 'INPUT',      'ACCESSKEY|CHECKED|CLASS|DISABLED|ID|LANG|LANGUAGE|MAXLENGTH|'.
+               'NAME|READONLY|SIZE|SRC|STYLE|TABINDEX|TITLE|TYPE|VALUE|'.
+               $msFullEvents,
+ 'ISINDEX',    'ACTION|PROMPT|HREF',
+ 'KBD',        $msTextAttrs,
+ 'LABEL',      'ACCESSKEY|CLASS|DATAFLD|DATAFORMATAS|DATASRC|FOR|ID|LANG|'.
+               'LANGUAGE|STYLE|TITLE|'.$msEvents,
+ 'LI',         'CLASS|ID|LANG|LANGUAGE|STYLE|TITLE|TYPE|VALUE|'.$msEvents,
+ 'LINK',       'DISABLED|HREF|ID|REL|TITLE|TYPE',
+ 'LISTING',    $msTextAttrs,
+ 'MAP',        'CLASS|ID|LANG|NAME|STYLE|TITLE'.$msEvents,
+ 'MARQUEE',    'BEHAVIOR|BGCOLOR|CLASS|DATAFLD|DATAFORMATAS|DATASRC|'.
+               'DIRECTION|HEIGHT|HSPACE|ID|LANG|LANGUAGE|LOOP|'.
+               'SCROLLAMOUNT|SCROLLDELAY|STYLE|TITLE|TRUESPEED|VSPACE|WIDTH|'.
+               $msFullEvents,
+ 'MENU',       'CLASS|ID|LANG|STYLE|TITLE|'.$msEvents,
+ 'META',       'CONTENT|HTTP-EQUIV|NAME|TITLE|URL',
+ 'NEXTID',     'TITLE',
+ 'NOBR',       'ID|STYLE|TITLE',
+ 'NOFRAMES',   'ID|STYLE|TITLE',
+ 'NOSCRIPT',   '',
+ 'OBJECT',     'ACCESSKEY|ALIGN|CLASS|CLASSID|CODE|CODEBASE|CODETYPE|DATA|'.
+               'DATAFLD|DATASRC|HEIGHT|ID|LANG|LANGUAGE|NAME|STYLE|TABINDEX|'.
+               'TITLE|TYPE|WIDTH|'.$msFullEvents,
+ 'OL',         'CLASS|ID|LANG|LANGUAGE|START|STYLE|TITLE|TYPE|'.$msEvents,
+ 'OPTION',     'CLASS|ID|LANG|LANGUAGE|SELECTED|TITLE|VALUE|ONSELECTSTART',
+ 'P',          'ALIGN|'.$msTextAttrs,
+ 'PARAM',      'DATAFLD|DATAFORMATAS|DATASRC|NAME|VALUE',
+ 'PLAINTEXT',  $msTextAttrs,
+ 'PRE',        $msTextAttrs,
+ 'S',          $msTextAttrs,
+ 'SAMP',       $msTextAttrs,
+ 'SCRIPT',     'CLASS|EVENT|FOR|ID|LANGUAGE|SRC|TITLE',
+ 'SELECT',     'ACCESSKEY|ALIGN|CLASS|DATAFLD|DATASRC|DISABLED|ID|LANG|'.
+               'LANGUAGE|MULTIPLE|NAME|SIZE|STYLE|TABINDEX|TITLE|'.
+               $msFullEvents,
+ 'SMALL',      $msTextAttrs,
+ 'SPAN',       'CLASS|DATAFLD|DATAFORMATAS|DATASRC|ID|LANG|LANGUAGE|STYLE|'.
+               'TITLE|'.$msEvents,
+ 'STRIKE',     $msTextAttrs,
+ 'STRONG',     $msTextAttrs,
+ 'STYLE',      'DISABLED|TITLE|TYPE',
+ 'SUB',        $msTextAttrs,
+ 'SUP',        $msTextAttrs,
+ 'TABLE',      'ALIGN|BACKGROUND|BGCOLOR|BORDER|BORDERCOLOR|BORDERCOLORDARK|'.
+               'BORDERCOLORLIGHT|CELLPADDING|CELLSPACING|CLASS|COLS|'.
+               'DATAPAGESIZE|DATASRC|FRAME|HEIGHT|ID|LANG|LANGUAGE|RULES|'.
+               'STYLE|TITLE|WIDTH|'.$msFullEvents,
+ 'TBODY',      'ALIGN|BGCOLOR|CLASS|ID|LANG|LANGUAGE|STYLE|TITLE|VALIGN'.
+               $msEvents,
+ 'TD',         'ALIGN|BACKGROUND|BGCOLOR|BORDERCOLOR|BORDERCOLORDARK|'.
+               'BORDERCOLORLIGHT|CLASS|COLSPAN|ID|LANG|LANGUAGE|NOWRAP|'.
+               'ROWSPAN|STYLE|TITLE|VALIGN|'.$msFullEvents,
+ 'TEXTAREA',   'ACCESSKEY|ALIGN|CLASS|COLS|DATAFLD|DATASRC|DISABLED|'.
+               'ID|LANG|LANGUAGE|NAME|READONLY|ROWS|STYLE|TABINDEX|TITLE|'.
+               'WRAP|'.$msFullEvents,
+ 'TFOOT',      'ALIGN|BGCOLOR|CLASS|ID|LANG|LANGUAGE|STYLE|TITLE|VALIGN'.
+               $msEvents,
+ 'TH',         'ALIGN|BACKGROUND|BGCOLOR|BORDERCOLOR|BORDERCOLORDARK|'.
+               'BORDERCOLORLIGHT|CLASS|COLSPAN|ID|LANG|LANGUAGE|NOWRAP|'.
+               'ROWSPAN|STYLE|TITLE|VALIGN|'.$msFullEvents,
+ 'THEAD',      'ALIGN|BGCOLOR|CLASS|ID|LANG|LANGUAGE|STYLE|TITLE|VALIGN'.
+               $msEvents,
+ 'TITLE',      'ID|TITLE',
+ 'TR',         'ALIGN|BGCOLOR|BORDERCOLOR|BORDERCOLORLIGHT|'.
+               'BORDERCOLORDARK|CLASS|ID|LANG|LANGUAGE|STYLE|TITLE|VALIGN|'.
+               $msFullEvents,
+ 'TT',         $msTextAttrs,
+ 'U',          $msTextAttrs,
+ 'UL',         'CLASS|ID|LANG|LANGUAGE|STYLE|TITLE|TYPE|'.$msEvents,
+ 'VAR',        $msTextAttrs,
+ 'WBR',        'CLASS|ID|LANG|LANGUAGE|STYLE|TITLE',
+ 'XMP',        $msTextAttrs,
 );
-$msColors = 'Black|White|Green|Maroon|Olive|Navy|Purple|Gray|'.
-            'Red|Yellow|Blue|Teal|Lime|Aqua|Fuchsia|Silver';
+$msPaired   = 'BUTTON|COMMENT|COL|COLGROUP|FRAMESET|IFRAME|LABEL|LEGEND|'.
+	      'MARQUEE|NOBR|NOFRAMES|NOSCRIPT|OBJECT|SPAN|TBODY|'.
+	      'TFOOT|THEAD';
 
 %mustFollow =
 (
- 'LH',       'UL|OL|DL',
- 'OVERLAY',  'FIG',
- 'HEAD',     'HTML',
- 'BODY',     '/HEAD',
- 'FRAMESET', '/HEAD|/FRAME|/FRAMESET|/NOFRAMES',
- '/HTML',    '/BODY|/FRAMESET',
+ 'LH',         'UL|OL|DL',
+ 'OVERLAY',    'FIG',
+ 'HEAD',       'HTML',
+ 'BODY',       '/HEAD|NOFRAMES|/FRAMESET',
+ 'FRAMESET',   '/HEAD|/FRAME|/FRAMESET|/NOFRAMES|HTML',
+ '/HTML',      '/BODY|/FRAMESET|/NOFRAMES',
+ '/NOFRAMES',  '/BODY'
  );
 
 %badTextContext =
@@ -389,6 +500,10 @@ $msColors = 'Black|White|Green|Maroon|Olive|Navy|Purple|Gray|'.
 	    'todo', 'U',
 	    'noglobals', 'pedantic', 'urlget=s', 'v', 'version', 'warnings',
 	    'x=s');
+# to suppress warnings with -w
+$opt_warnings = $opt_pedantic = $opt_help = $opt_todo = $opt_version =
+   $opt_i = $opt_t = $opt_u = $opt_v = $opt_noglobals = $opt_stderr = 0;
+$name = '';
 
 $exit_status = 0;
 
@@ -419,7 +534,7 @@ elsif (-f $USER_RCFILE)
 {
    &ReadConfigFile($USER_RCFILE);
 }
-elsif (! $opt_noglobals && -f $SITE_RCFILE)
+elsif (! $opt_noglobals && defined $SITE_RCFILE && -f $SITE_RCFILE)
 {
    &ReadConfigFile($SITE_RCFILE);
 }
@@ -519,6 +634,7 @@ sub WebLint
    local(@orphanlines) = ();
    local(%seenPage);
    local(%seenTag);
+   local($lastTAG) = '';
    local(%whined);
    local(*PAGE);
    local($line) = ('');
@@ -577,7 +693,7 @@ sub WebLint
       while ($line =~ /</o)
       {
 	 $tail = $'; #'
-	 undef $lastNonTag;
+	 $lastNonTag = '';
 	 if ($` !~ /^\s*$/o)
 	 {
 	    $lastNonTag = $`;
@@ -687,12 +803,13 @@ sub WebLint
 	 }
 
 	 #-- special case for empty optional container elements
-	 if (!$closing && $ID eq $tags[$#tags] && $lastTAG eq $ID
+	 if (!$closing && @tags > 0 && $ID eq $tags[$#tags] && $lastTAG eq $ID
 	     && $ID =~ /^($maybePaired)$/
 	     && $tagNums[$#tagNums] == ($tagNum - 1)
-	     && $lastNonTag =~ /^\s*$/o)
+	     && $lastNonTag =~ /^\s*$/o
+	     && $ID ne 'COL' && $ID ne 'COLGROUP')
 	 {
-	    $t = pop @tags;
+	    pop @tags; # pop off the tag, don't care what it is
 	    $tline = pop @taglines;
 	    pop @tagNums;
 	    &whine($tline, 'empty-container', $ID);
@@ -700,22 +817,22 @@ sub WebLint
 	 }
 
          #-- whine about unrecognized element, and do no more checks ----
-         if ($id !~ /^($legalElements)$/io)
+         if (!defined $validAttributes{$ID})
 	 {
-	    if ($id =~ /^($netscapeElements|$javaElement|$msElement)$/io)
-	    {
-	       &whine($., 'extension-markup', ($closing ? "/$id" : "$id"));
-	    }
-	    else
-	    {
-	       &whine($., 'unknown-element', ($closing ? "/$id" : "$id"));
-	    }
-	    next;
+             if (defined $netscapeAttributes{$ID}
+                 || defined $msAttributes{$ID})
+             {
+                 &whine($., 'extension-markup', ($closing ? "/$id" : "$id"));
+             }
+             else
+             {
+                 &whine($., 'unknown-element', ($closing ? "/$id" : "$id"));
+             }
+             next;
 	 }
 
          if ($closing == 0 && defined $requiredAttributes{$ID})
          {
-	    @argkeys = keys %args;
 	    foreach $attr (split(/\|/,$requiredAttributes{$ID}))
 	    {
 	       unless (defined $args{$attr})
@@ -807,7 +924,9 @@ sub WebLint
 	    }
 
 	    #-- check for mailto: LINK ------------------------------
-	    if ($ID eq 'LINK' && $args{'REV'} =~ /^made$/io
+	    if ($ID eq 'LINK' && defined $args{'REV'}
+                && defined $args{'HREF'}
+                && $args{'REV'} =~ /^made$/io
 		&& $args{'HREF'} =~ /^mailto:/io)
 	    {
 	       $seenMailtoLink = 1;
@@ -837,12 +956,15 @@ sub WebLint
 	       &whine($., 'nested-element', $ID, $taglines[$i]);
 	    }
 
-	    &whine($., 'unknown-element', $ID) unless $ID =~ /^($legalElements)$/o;
+            unless (defined $validAttributes{$ID})
+	    {
+	       &whine($., 'unknown-element', $ID);
+	    }
 
 	    #--------------------------------------------------------
 	    # check for tags which have a required context
 	    #--------------------------------------------------------
-	    if (defined ($reqCon = $requiredContext{$ID}))
+	    if (defined $requiredContext{$ID})
 	    {
 	       $ok = 0;
 	       foreach $context (split(/\|/, $requiredContext{$ID}))
@@ -880,7 +1002,7 @@ sub WebLint
          #--------------------------------------------------------
          if ($ID =~ /^($pairElements)$/o)
          {
-	    if (!$closing && $ID eq $tags[$#tags] &&
+	    if (!$closing && @tags > 0 && $ID eq $tags[$#tags] &&
 		$ID =~ /^($maybePaired)$/o)
 	    {
 	       pop @tags;
@@ -1013,7 +1135,6 @@ sub WebLint
 				   && !$closing);
 
       } continue {
-	 $lastTagNum = $tagNum;
 	 ++$tagNum;
          $lastTAG = $TAG;
       }
@@ -1048,8 +1169,8 @@ sub WebLint
    }
    if (@notSeen > 0)
    {
-      printf ("%sexpected tag(s) not seen: @notSeen\n",
-		      ($opt_s ? "" : "$filename(-): "));
+      printf "%sexpected tag(s) not seen: @notSeen\n",
+		      ($opt_s ? "" : "$filename(-): ");
       $exit_status = 1;
    }
 }
@@ -1068,7 +1189,7 @@ sub CheckAttributes
       $ID = "\U$id";
 
       # don't worry, or warn, about attributes of unknown elements
-      return unless $ID =~ /^($legalElements)$/io;
+      return unless defined $validAttributes{$ID};
 
       $tail =~ s/\n/ /go;
 
@@ -1087,10 +1208,13 @@ sub CheckAttributes
 
 	 &whine($., 'unexpected-open', $tag) if $arg =~ /</o;
 
-	 if ($arg !~ /^($valid)$/i && $ID =~ /^($legalElements)$/o)
+	 if (defined $validAttributes{$ID}
+             && $arg !~ /^($valid)$/i)
 	 {
-	    if ($arg =~ /^($netscapeAttributes{$ID})$/io
-                || $arg =~ /^($msAttributes{$ID})$/io)
+	    if (   (defined $netscapeAttributes{$ID}
+                    && $arg =~ /^($netscapeAttributes{$ID})$/i)
+                || (defined $msAttributes{$ID}
+                    && $arg =~ /^($msAttributes{$ID})$/i))
 	    {
 	       &whine($., 'extension-attribute', $arg, $id);
 	    }
@@ -1178,6 +1302,7 @@ sub whine
 
 
    return unless $enabled{$id};
+   @argv = @argv;
    $exit_status = 1;
    (print "$filename:$line:$id\n"), return             if $mstyle eq 'terse';
    (eval "print \"\$filename($line): $message{$id}\n\""), return if $mstyle eq 'lint';
@@ -1290,9 +1415,9 @@ sub enableWarning
    # ensure consistency: if you just enabled upper-case,
    # then we should make sure that lower-case is disabled
    #
-   $enabled{'lower-case'} = 0 if $_ eq 'upper-case';
-   $enabled{'upper-case'} = 0 if $_ eq 'lower-case';
-   $enabled{'upper-case'} = $enabled{'lower-case'} = 0 if $_ eq 'mixed-case';
+   $enabled{'lower-case'} = 0 if $id eq 'upper-case';
+   $enabled{'upper-case'} = 0 if $id eq 'lower-case';
+   $enabled{'upper-case'} = $enabled{'lower-case'} = 0 if $id eq 'mixed-case';
 
    return 1;
 }
@@ -1302,7 +1427,6 @@ sub enableWarning
 # Purpose:	Extend the HTML understood.  Currently supported extensions:
 #			Netscape  - the netscape extensions proposed by
 #                                   Netscape Communications, Inc.  See:
-#			Java      - Java elements
 #			Microsoft - the extensions for Microsoft Internet
 #				    Explorer
 #               http://www.netscape.com/home/services_docs/html-extensions.html
@@ -1321,30 +1445,9 @@ sub AddExtension
    }
 
    if (   $extension ne 'netscape'
-       && $extension ne 'java'
        && $extension ne 'microsoft')
    {
       warn "$PROGRAM: unknown extension `$extension' -- ignoring.\n";
-      return;
-   }
-
-   #---------------------------------------------------------------------
-   # Java extensions
-   #---------------------------------------------------------------------
-
-   if ($extension eq 'java')
-   {
-      $legalElements .= '|'.$javaElements;
-      $pairElements  .= '|APPLET';
-
-      &AddAttributes('APPLET', 'CODEBASE', 'CODE', 'ALT', 'NAME',
-			       'WIDTH', 'HEIGHT', 'ALIGN', 'VSPACE', 'HSPACE');
-      &AddAttributes('PARAM', 'NAME', 'VALUE');
-
-      $requiredContext{'PARAM'} = 'APPLET';
-      $requiredAttributes{'APPLET'} = 'CODE|WIDTH|HEIGHT';
-      $requiredAttributes{'PARAM'} = 'NAME|VALUE';
-
       return;
    }
 
@@ -1356,12 +1459,11 @@ sub AddExtension
       #-- new element attributes for existing elements ---------------------
       foreach $element (keys %msAttributes)
       {
-	 &AddAttributes($element, split(/\|/, $msAttributes{$element}));
+          $validAttributes{$element} = $msAttributes{$element};
       }
 
-      $legalElements .= '|'.$msElements;
-      $pairElements  .= '|CENTER|FONT|MAP|MARQUEE|NOBR';
-      $expectArgsRE .= '|FONT';
+      $pairElements  .= '|'.$msPaired;
+      $maybePaired   .= '|COL|COLGROUP';
 
       $attributeFormat{'LOOP'} = '\d+|INFINITE';
       $okInHead{'BGSOUND'} = 1;
@@ -1384,9 +1486,31 @@ sub AddExtension
       $attributeFormat{'LINK'} = $attributeFormat{'TEXT'} =
       $attributeFormat{'BGCOLOR'} =
       $attributeFormat{'COLOR'} = $attributeFormat{'BORDERCOLOR'} =
-      $attributeFormat{'BORDERCOLORLIGHT'} =
-      $attributeFormat{'BORDERCOLORDARK'} = $colorRE.'|'.$msColors;
+      $attributeFormat{'BORDERCOLORLIGHT'} = $colorRE;
 
+      # LI TYPE= can take A, a, I, i, or 1
+      $attributeFormat{'TYPE'} .= '|[AaIi1]';
+
+      # the FRAME and RULES attributes for TABLE element
+      $attributeFormat{'FRAME'} = 'VOID|ABOVE|BELOW|HSIDES|LHS|RHS|VSIDES|'.
+	                           'BOX|BORDER';
+      $attributeFormat{'RULES'} = 'NONE|GROUPS|ROWS|COLS|ALL';
+
+      # START attribute for IMG element
+      $attributeFormat{'START'} = 'FILEOPEN|MOUSEOVER';
+
+      # VALUETYPE attribute for PARAM element (in an OBJECT)
+      $attributeFormat{'VALUETYPE'} = 'DATA|REF|OBJECT';
+
+      $requiredContext{'THEAD'} = 'TABLE';
+      $requiredContext{'TBODY'} = 'TABLE';
+      $requiredContext{'TFOOT'} = 'TABLE';
+      $requiredContext{'COLGROUP'} = 'TABLE';
+      $requiredContext{'COL'} = 'COLGROUP';
+      $requiredContext{'PARAM'} = 'APPLET|OBJECT';
+
+      # COMMENT, LISTING, PLAINTEXT, and XMP are valid elements for Microsoft
+      $obsoleteTags = '';
    }
 
    #---------------------------------------------------------------------
@@ -1398,7 +1522,7 @@ sub AddExtension
       #-- new element attributes for existing elements ---------------------
       foreach $element (keys %netscapeAttributes)
       {
-	 &AddAttributes($element, split(/\|/, $netscapeAttributes{$element}));
+          $validAttributes{$element} = $netscapeAttributes{$element};
       }
 
       #-- formats for new attributes ---------------------------------------
@@ -1407,29 +1531,29 @@ sub AddExtension
       $attributeFormat{'MARGINWIDTH'} = '\d+';
       $attributeFormat{'MARGINHEIGHT'} = '\d+';
       $attributeFormat{'SCROLLING'} = 'NO|YES|AUTO';
-      $attributeFormat{'WIDTH'} = '\d+%?';
       $attributeFormat{'TYPE'} .= '|[AaIi1]|disc|square|circle';
+
+      #-- attributes for EMBED element
+      $attributeFormat{'TYPE'} .= '|.+';
+      $attributeFormat{'PALETTE'} = 'FOREGROUND|BACKGROUND';
 
       #-- new elements -----------------------------------------------------
 
-      $legalElements .= '|'.$netscapeElements;
-      $pairElements  .= '|BLINK|CENTER|FONT|FRAMESET|NOFRAMES|NOBR|MAP|SCRIPT';
-      $requiredContext{'AREA'}  = 'MAP';
-      $requiredContext{'FRAME'} = 'FRAMESET';
-      $requiredAttributes{'MAP'}   = 'NAME';
-      $requiredAttributes{'AREA'}  = 'COORDS';
+      $pairElements  .= '|'.$netscapePaired;
+      $requiredContext{'AREA'}    = 'MAP';
+      $requiredContext{'FRAME'}   = 'FRAMESET';
+      $requiredContext{'KEYGEN'}  = 'FORM';
+      $requiredAttributes{'MAP'}  = 'NAME';
+      $requiredAttributes{'AREA'} = 'COORDS';
 
       # this should really be specific to ROWS and COLS in FRAMESET element<
       $attributeFormat{'ROWS'} =
-	 $attributeFormat{'COLS'} = '\d+|(\d*[*%]?,)*\d*[*%]?';
+	 $attributeFormat{'COLS'} = '\d+|(\d*[*%]?,)*\s*\d*[*%]?';
 
       # this is for TEXTAREA
       $attributeFormat{'WRAP'} .= '|SOFT|HARD';
 
       # attribute format check for attributes which take colors
-      $attributeFormat{'ALINK'} = $attributeFormat{'VLINK'} =
-      $attributeFormat{'LINK'} = $attributeFormat{'TEXT'} =
-      $attributeFormat{'BGCOLOR'} = $colorRE;
       $attributeFormat{'ALIGN'} .= '|TEXTTOP|ABSMIDDLE|BASELINE|ABSBOTTOM';
 
       # BASE can take just a TARGET attribute, HREF not required therefore
@@ -1485,7 +1609,7 @@ sub CheckURL
    local($urlget)	= $variable{'url-get'};
 
 
-   die "$PRORGAM: url-get variable is not defined -- ".
+   die "$PROGRAM: url-get variable is not defined -- ".
        "don't know how to get $url\n" unless defined $urlget;
 
    system("$urlget $url > $workfile");

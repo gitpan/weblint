@@ -1,73 +1,29 @@
 
-			ChangeLog for Weblint 1.017
+			ChangeLog for Weblint 1.019
 
 	Changes in all past releases can be found on the weblint home page:
 		http://www.cre.canon.co.uk/~neilb/weblint/
 
-1.017
+1.019
 
-    4-july-1996 neilb
+    *	The README was referring to weblint-test.log rather than test.log
+    *	Forgot to take out explicit #! at start of weblint and test.pl
+    *	Fixed -w warnings
+    *	Improved handling of ordering of FRAMESET, BODY, NOFRAMES etc
+    *	Fixed a bug in attribute format checking for COLS
 
-    *	Added support for missing values of ALIGN when in the IMG
-	element: TEXTTOP, ABSMIDDLE, BASELINE, ABSBOTTOM.
+1.018
 
-    8-june-1996 neilb
+    *	Weblint now checks against HTML 3.2 by default.
 
-    *	Entered a bunch of outstanding bug reports and feature requests;
-	regenerated the web pages for these.
+    *	Added support for HTML as supported by Netscape 4.
 
-    *	Restructured the weblint web pages, and added a page with information
-	about supported platforms.
+    *	Added support for HTML as supported by Microsoft IE 4.
 
+    *	Removed Java as an extension option - folded into Microsoft & Netscape.
 
-    4-june-1996 neilb
+    *	Rewrote part of the testsuite to make it easier to add test cases.
 
-    *	Added a link to Jim Carpenter's weblint gateway:
-		http://www.tiac.net/users/zach1/htmlcheck/htmlcheck.shtml
-
-
-    26-may-1996 neilb
-
-    *	Weblint now won't generate warnings for attributes of unknown elements;
-	this includes extended markup, when the relevant extension is not
-	enabled. For example, if you have:
-
-		<FONT SIZE="+1">Hello, World</FONT>
-
-	Then you'd get a warning about extended markup, and also one
-	about the value of the SIZE attribute being illegal. Once you've
-	enabled the Netscape or Microsoft extension, it's not illegal.
-
-
-    *	You now get multiple warnings if '>' occurs multiple times,
-	where it should be represted as &gt;. For example:
-		<PRE>
-			if (x > y)
-				foobar();
-			if (x > z)
-				barfoo();
-		</PRE>
-	Will result in two warnings, where before you'd just get one.
-	Both warnings will have the right line number :-)
-
-
-    *	Fixed the problem where warnings about use of literal '>' would
-	often give the wrong line number. For example:
-
-		<PRE>
-			if (x > y)
-				foobar();
-		</PRE>
-
-	Would give the line number for "</PRE>" when warning about the '>'
-	two lines above. Fixed the two test-cases for these warnings.
-
-
-    24-may-1996 neilb
-
-    *	The KNOWN BUGS section of the man page now includes the URL for the
-	ToDo list for weblint.
-
-    *	I had accidentally deleted the section in weblintrc for things added
-	in the 1.015 release. I put them back.
+    *	Fixed a typo where $PROGRAM appeared as $PRORGAM in one error message.
+	Reported by Masayasu Ishikawa <mimasa@aichi-u.ac.jp>
 

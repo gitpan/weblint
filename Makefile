@@ -1,7 +1,7 @@
 #
 # Makefile for weblint
 #
-VERSION	= 1.017
+VERSION	= 1.019
 
 SHELL	= /bin/sh
 

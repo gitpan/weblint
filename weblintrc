@@ -1,6 +1,6 @@
 #
 # sample configuration file for weblint
-# distributed as part of weblint 1.017
+# distributed as part of weblint 1.019
 #
 # The settings in this file reflect the built-in defaults.
 # I.e. if a warning is enabled in this file, then it is enabled by
@@ -72,12 +72,6 @@ set file-extensions = html, htm
 #------------------------------------------------------------------------
 # uncomment following line to enable the Microsoft extensions
 # extension Microsoft
-
-#------------------------------------------------------------------------
-# Allow Java HTML extensions: the APPLET and PARAM elements
-#------------------------------------------------------------------------
-# uncomment following line to enable the Java extensions
-# extension Java
 
 
 #========================================================================
@@ -403,9 +397,10 @@ enable meta-in-pre
 #------------------------------------------------------------------------
 enable quote-attribute-value
 
+
 # ========================================================================
-# New stuff in the 1.017 release
+# New stuff in the 1.019 release
 # ========================================================================
 
-#-- no new warnings or variables added in 1.017 
+#-- no new warnings or variables added in 1.019
 

@@ -1,5 +1,5 @@
-.ds wV 1.017
-.TH "weblint \*(wV" 1L "April 96" "Handmade"
+.ds wV 1.019
+.TH "weblint \*(wV" 1L "August 97" "Handmade"
 .de tS
 ..
 .de tE
@@ -110,6 +110,7 @@ home.html(9): unmatched </A> (no matching <A> seen).
 .TP
 Weblint includes the following features:
 .lS
+.lI "by default checks for HTML 3.2 (Wilbur)"
 .lI "46 different checks and warnings"
 .lI "Warnings can be enabled/disabled individually, as per your preference"
 .lI "basic structure and syntax checks"
@@ -122,8 +123,7 @@ Weblint includes the following features:
 .lI "stylistic checks"
 .lI "checks for html which is not portable across all browsers"
 .lI "flags markup embedded in comments, since this can confuse some browsers"
-.lI "support for Netscape, Java, and Microsoft HTML extensions"
-.lI "HTML 3 elements such as TABLE, MATH, and FIG are supported"
+.lI "support for Netscape, and Microsoft HTML extensions"
 .lE
 .SH OPTIONS
 .tS
@@ -174,13 +174,13 @@ and whether the warning is enabled.
 .tI "-x \fIextension\fP"
 Include checks for the specified HTML extension;
 multiple extensions can be specified, separated with a comma.
-Currently the only extensions supported are \fINetscape\fP and \fIJava\fP.
+Currently the only extensions supported are \fINetscape\fP and \fIMicrosoft\fP.
 This can also be set in your weblint configuration file,
 described below.
 .tE
 .SH "HTML EXTENSIONS"
-\fIWeblint\fP supports a number of extensions to html,
-which are not recognized by default.
+Unless you specify otherwise, weblint assumes you are using HTML 3.2.
+Weblint supports the Netscape and Microsoft HTML extensions in addition.
 For example, weblint will complain that the BLINK
 element is not known,
 unless you enable the
@@ -189,12 +189,9 @@ extension.
 The following extensions are currently supported:
 .tS
 .tI "Netscape"
-The HTML extensions supported by the Netscape browser, version 2.1.
+The HTML extensions supported by the Netscape browser, version 4.
 .tI "Microsoft"
-The HTML extensions supported by Microsoft Internet Explorer, version 2.1.
-.tI "Java"
-The extensions supported by Java-enhanced browsers.
-This is the APPLET and PARAM elements.
+The HTML extensions supported by Microsoft Internet Explorer, version 4.
 .tE
 .LP
 To enable an extension, you can either use the \fB-x\fP command-line
@@ -207,16 +204,9 @@ switch:
 Or you can use the \fBextension\fP keyword in your \fI.weblintrc\fP:
 .nf
 
-    \f(CW\s-2# enable the Java extensions (APPLET and PARAM elements)
-    extension Java\s+2\fP
+    \f(CW\s-2# enable the Microsoft extensions
+    extension Microsoft\s+2\fP
 
-.fi
-Multiple extensions can be enabled at the same time - they are
-separated with a comma, when using either mechanism:
-.nf
-    \f(CW\s-2% weblint -x Netscape,Java foobar.html
-
-    extension Netscape,Java\s+2\fP
 .fi
 .SH "CONFIGURATION FILE"
 \fIWeblint\fP can be configured using a file \fI.weblintrc\fP 
@@ -249,9 +239,6 @@ disable obsolete
 
 # enable the Netscape HTML extensions
 extension Netscape
-
-# or, to enable both Netscape and Java extensions
-extension Netscape,Java
 
 # when recursing in a directory,
 # ignore files which are symlinks (also known as soft links)
