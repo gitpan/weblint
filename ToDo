@@ -1,0 +1,286 @@
+
+                        Weblint ToDo list - Weblint 1.015
+
+
+    o	Time for a rewrite -- the code is nasty!
+
+
+    o	Rewrite in perl 5 -- the data structures will be much easier. This
+	will have to wait until Perl 5 is more stable, with stable ports
+	for Mac and PCs.
+
+
+    o	A Weblint.pm module for perl 5?
+
+
+    o	Verbose option to give longer warnings with example syntax.
+
+
+    o	build list of external links, for optional check at end.
+
+
+    o   check if any file in a directory hierarchy is not referenced.
+
+
+    o	Misuse of meta-characters, such as <, >, and ".
+		(Barry Bakalor <barry@hal.com>)
+
+
+    o	check for http://foo.com/nar/tar.gz!
+
+
+    o	option to spell-check text (Clay Webster <clay@unipress.com>)
+
+
+    o	option to specify level of HTML (0, 1, or 2)
+
+
+    o	option to understand server-side includes, e.g.:
+		<!inc srv "/Header.html">
+
+
+    o	entity checks (Axel Boldt).
+
+
+    o	bad-link check gets confused if given a path with directories in it,
+	such as foo/bar/fred.html (Barry Bakalor)
+
+
+    o	Use a DTD!
+
+
+    o	Option to spit out the HTML source annotated with SGML comments
+	which contain any weblint warnings. Tom Neff <tneff@panix.com>
+	This will be: set message-style = inline -- neilb
+
+
+    o	Support for weblint directives in SGML comments.
+	Tom Neff <tneff@panix.com>
+
+
+    o	A standardized "Weblint approved" snippet of HTML to put in pages.
+	This would also be a link to the weblint home page.
+	Tom Neff <tneff@panix.com>
+
+
+    o	Flag places where use of <P> is redundant, and considered bad style;
+	such as following a <H?>.  See "Composing Good HTML".
+
+
+    o	Illegal context check, such as <P> appearing in <H1> ... </H1>
+	Jokinen Jyke <jyke@cs.tut.fi>, Axel Boldt.
+
+
+    o	Check for existence of files with:
+		<IMG src="missing.gif" alt="Missing Image">
+		<BODY background="missing.gif">
+	as it already does with:
+		<A HREF="missing.html">missing thing</A>
+	(Barry Bakalor <barry@hal.com>)
+
+
+    o	Give a more helpful message when <A NAME="..."> is not closed.
+
+
+    o	The following is legal HTML, but weblint complains:
+		<img alt = "> FOO <" src = "foo.gif">
+	Reported by Abigail <abigail@mars.ic.iaf.nl>
+
+
+    o	Check that HREF and other URLs are syntactically correct.
+	For example:
+		<LI><A HREF="ftp:sqn35.exe">Download SquareNote V3.5 Now.</A>  
+	This HREF is invalid.  Larry Virden <lvirden@cas.org>
+
+
+    o	Font change stylistic errors, for example in netscape:
+		<b>
+		<center><h1>text to be centered</h1></center>
+		<center><h1>more text to be centered</h1></center>
+		</b>
+
+	html-check (sgmls) at least says that the problem is that a center tag
+	turns off the bold tag.  Also, the header also turned off bold as well.
+	By changing the code to:
+	    <h1 align="center"><strong>text to be centered</strong></h1>
+	    <h1 align="center"><strong>more text to be centered</strong></h1>
+	html-check/sgmls indicated the code was better formed.
+	Larry Virden <lvirden@cas.org>
+
+    o	Get descriptions of how to use weblint on non-Unix platforms,
+	such as Mac, MSDOS, Windows, etc.
+
+    o	Try downloading the .tar.gz distribution via netscape;
+	some people have experienced problems with this.
+
+
+    o	Have a basic form, and one with toggles for all the warnings,
+	and other options.
+
+
+    o	Better handling of the fact that the HTML, HEAD, and BODY
+	tags are optional.
+
+
+    o	Adopt a common scheme for bits of weblint documentation,
+	so that manpage, README, and web pages can share common text.
+	Something based on SGML is the way to go. That way I could also
+	generate ascii and html versions of everything.
+
+
+    o	Automate appropriate parts of the release process.
+
+
+    o	Better coverage of announcement of new versions:
+	     -	standard format for announcements
+	     -	hit more places, as listed in URL announce FAQ
+
+
+    o	Crontab set up to create todo/history file for weblint,
+	based on ToDo and ChangeLog files in my work version.
+
+
+    o	I'm only new to HTML, but I think you shouldn't have
+	<ul>'s within <p> ... </p>: weblint doesn't pick this. I
+	think your Todo list covers this, though...
+	Frank Steinke <fsteinke@zeta.org.au>
+
+
+    o	A web document I have mentions <cmd> and <arg> as
+	components of HTML+, but weblint doesn't know these.
+	Frank Steinke <fsteinke@zeta.org.au>
+
+
+    o	Also, I accidently marked two items as CHECKED on a <input type=radio>
+	construct and weblint didn't flag it for me.  Netscape treated like
+	a checkbox construct but then wouldn't let me deselect the items.
+	Bruce Speyer <bspeyer@texas-one.org>
+
+
+    o	I however want to be able to check for SGML style processing tags
+	(for example <?MIVAR> <?/MIVAR>) and they appear to break weblint.
+
+	The only syntax difference I want is to be able to use tags that have
+	a question mark after the leading "<". This notation signifies a
+	processing tag in SGML - I dont know alot about SGML either,
+	that was all I needed to know :)
+
+	Sean Riley <sean@illustra.com>
+
+
+    o	I believe an INPUT tag with TYPE=image may also contain at least some
+	of the attributes associated with the IMG tag, such as ALIGN, BORDER,
+	HEIGHT, and WIDTH.  Weblint incorrectly flags these as errors.  I don't
+	think ALT, ISMAP, or USEMAP would make sense.
+	Barry Bakalor <barry@hal.com>
+
+
+    o	html-check claims that if one has an open <FONT> tag and then
+	encounters a <P>, the open FONT is assumed closed.  This wasn't
+	a condition caught by weblint.  Just thought I would mention it.
+	Larry W. Virden <lvirden@cas.org>
+
+
+    o	I think a demo html file would be useful for demonstrating the tool.
+	I wanted to demonstrate to prospective users what it could do for
+	them so I created a very basic badsyntax.html file by looking at the
+	comments in the weblintrc file and creating bad code for those
+	conditions:
+		<TOTLE>test page </Title>
+		<H2>Hello</H2>
+		Click <A HREF=index.html>here</A> to switch to another link
+		<HR>
+		<H1></H1>
+		<H1></H2>
+		</H3>fjkejfkdsjf</H3>
+	Doug Grinbergs <dougg@qualcomm.com>
+
+
+    o	I'd like a setting to optionally mandate "</p>" follow "<p>"
+	Michael P. Gerlek <gerlek@dat.cse.ogi.edu>
+
+
+    o	Perhaps when you encounter the empty container element you could
+	suggest that the user change the p to a br? I think folk are often
+	using a paragraph element instead of the more correct break line tag.
+	Larry W. Virden <lvirden@cas.org>
+
+
+    o	Add a 'spinner' extension to support the Spinner markup.
+
+
+    o	Count the total number of lines in the file (or files in the case of
+	recursive descent of directories), then count the number of warnings.
+	Then compute a score for the file or files using a formula something
+	like this:
+
+		SCORE = ((#lines - #warns) / (#lines)) * 100
+
+	It's technically possible for a really bad file to get a negative
+	score, which is something I don't like, but I thought it would be
+	an interesting (though probalby useless) feature.
+
+	I also propose that it only be considered a valid measure when used
+	in conjunction with pedantic.
+	Jeremy Worley <jworley@khoral.com>
+
+
+    o	The attribute format check should be element sensitive, since some
+	attributes can take different values when used in different elements,
+	such as the ALIGN attribute. When we move over to perl 5 this will
+	be easier to do, thanks to the improved data structure support.
+
+
+    o	SUB and SUP take one set of attributes in MATH mode, and
+	a different set when used outside MATH mode. See the comment above
+	for the attribute format check. Maybe I'll just go to perl 5 now . . .
+
+
+    o	Add a timing testsuite -- similar the the current testsuite,
+	but which allows me to keep track of performance changes.
+	Every time a new warning or feature is added, it slows weblint down.
+	It's gonna be time for a performance tuning release again soon :-)
+
+
+    o	You signal that COORDS is required for a SHAPE=DEFAULT <<AREA>
+	specification. This is incorrect as none is needed.
+
+	Bill Merrow <bmerrow@ix.netcom.com>
+
+
+    o	Just wanted to let you know the latest version of weblint
+	doesn't support "BORDER=0" in:
+
+		<INPUT TYPE="image" NAME="SearchButton" BORDER=0
+		SRC="/at/pictures/AT-search_button.gif">
+
+	such a page can be seen in http://mistral.enst.fr/at/ for instance.
+
+	Nicolas Pioch <pioch@email.enst.fr>
+
+
+    o	Weblint doesn't generate a warning if you have an empty list
+	item (LI) at the end of a list. For example:
+		<UL>
+		<LI>First item
+		<LI>Second item
+		<LI>
+		</UL>
+
+    o	sometimes error message has funny '//' when scanning a directory,
+	like:
+		(/home/tristan/public_html//html):
+			directory does not have an index file (index.html)
+
+	Tristan Savatier <tristan@creative.net>
+
+
+    o	Classify each warning as one of:
+	    -	Syntax Error
+	    -	Portability
+	    -	Stylistic
+	and similar. Be able to specify that only syntax errors be generated.
+
+
+    o	Internationalization support
+

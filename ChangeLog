@@ -1,0 +1,171 @@
+
+			ChangeLog for Weblint 1.015
+
+	Changes in all past releases can be found on the weblint home page:
+		http://www.khoral.com/staff/neilb/weblint.html
+
+1.015
+
+    28-april-1996 neilb
+
+    *	Man page now includes a summary of weblint features, rather than
+	a list of all warnings, since it was getting over long.
+
+    *	Went through and capitalized all references to Netscape, Microsoft,
+	and Java. Pointed out by Doug Grinbergs <dougg@qualcomm.com>
+
+    *	Added /temp to the list of possible working directories for
+	the testsuite. I had added this to weblint earlier, but forgot
+	to update the testsuite.
+
+    *	Only changes for the current release will be included in the
+	Changelog which appears in the distribution, for size reasons.
+	The home page will still have changes from all releases.
+
+    20-april-1996 neilb
+
+    *	released 1.015 beta
+
+    8-april-1996 neilb
+
+    *	The testsuite now throws a newline after every 70 tests.
+
+    *	Added '/temp' to the list of directories to try when looking for
+	a working directory. Apparently this is more likely to exist on
+	PCs. Suggested by Keith Iosso <a-keithi@microsoft.com>
+
+    *	Added an attribute format check for BGCOLOR, ALINK, VLINK, LINK,
+	and TEXT for Netscape and Microsoft extensions. For Microsoft,
+	COLOR, BORDERCOLOR, BORDERCOLORLIGHT, and BORDERCOLORDARK are
+	also supported. The Microsoft color set is also understood
+	when checking attribute values.
+
+    *	released 1.015 alpha
+
+    7-april-1996 neilb
+
+    *	Added a new configuration variable 'file-extensions',
+	which is used to provide a list of valid filename extensions
+	used to identify files which should be checked when recursing
+	in directories. For example:
+
+		set file-extensions = html, htm
+
+	Defaults to the list shown above.
+
+    *	Weblint now warns about leading whitespace in list items.
+	Netscape will produce jagged looking lists if some, but not all,
+	list items have leading whitespace. Added test case.
+
+    *	Added an attribute format check for the CLEAR attribute,
+	which can take values LEFT, RIGHT, or ALL. Added test-case.
+
+    *	Weblint now supports TYPE attribute values of "disc", "circle",
+	and "square". These can be used with UL and LI to specify the
+	type of bullet. Added test case for each of these.
+	Reported by Gerald Viers <grviers@csupomona.edu>
+	Patch from Phil Hooper <hooper@bcci.eng.sun.com>
+
+    *	The FONT and BASE elements added to the list of elements where
+	at least one attribute is expected, but no single attribute is
+	required. Added test cases.
+	Suggested by Tristan Savatier <tristan@creative.net>
+
+    *	When the Netscape extension is enabled, the BASE element is no
+	longer required to have an HREF attribute, since the following
+	is now valid:
+		<BASE TARGET="banana">
+	Added a case to the testsuite.
+	Reported by Tristan Savatier <tristan@creative.net>
+
+    *	Added the PickTmpdir() routine (which was only used in test.pl)
+	into weblint. This makes weblint a little smarter about picking
+	a directory where temporary files should be created.
+
+    *   Fixed the attribute format code so the ROWS and COLS attributes
+        for FRAMESET are supported when the Netscape extension is enabled.
+	Added a case to the test-suite.
+        Reported by Chris Lambert <lambertc@sharelink.com> and
+        Tristan Savatier <tristan@creative.net>
+
+    4-april-1996 neilb
+
+    *	Fixed the Microsoft extension stuff so that WIDTH and HEIGHT
+	can be a percentage, since this is valid for things like the
+	MARQUEE element.
+	Reported by Keith Iosso <a-keithi@microsoft.com>
+
+    *	Added support for some Microsoft attributes:
+	    BODY:	ALINK
+	    TABLE:	CELLSPACING and CELLPADDING
+	Reported by Keith Iosso <a-keithi@microsoft.com>
+
+    *	Moved the code which handles the -todo switch after the config
+	file is read, since the user may have over-ridden the `url-get'
+	variable in $HOME/.weblintrc.
+	Patch from Raphael Manfredi <Raphael_Manfredi@grenoble.hp.com>
+
+    10-march-1996 neilb
+
+    *	Added a -f switch which is used to provide an explicit configuration
+	file, over-riding all the other possibilities :-)
+
+    *	Fixed a bug whereby the ID, LANG and CLASS attributes were not
+	recognized for any of the logical or physical font elements,
+	such as <I> and <STRONG>. For example:
+		<i class=species>
+		<strong class=urgent>
+	Added a test case to the testsuite.
+	Bug reported by Alan J. Flavell <FLAVELL@v2.ph.gla.ac.uk>
+
+    *	Changed the 'netscape-markup' warning to a more generic
+	'extension-markup' warning, and the 'netscape-attribute' warning
+	to a more generic 'extension-attribute' warning. The same warning
+	is generated if you use Netscape-specific markup, or Microsoft-specific
+	markup.
+
+    *	Added a new extension 'Microsoft', which makes weblint understand
+	the html extensions implemented by Microsoft's Internet Explorer.
+	Added a simple test case -- needs to cover more of the extensions.
+
+    *	Fixed bug where weblint complained about illegal attribute format
+	if you used the TYPE attribute for OL, with netscape extensions
+	enabled. Added a test case which includes an ordered list of each
+	TYPE. Bug reported by Bryan O'Sullivan <bos@serpentine.com>.
+
+    *	Added sequence which allows you to suck system defaults in from
+	within a personal config file:
+
+		use global weblintrc
+
+	This results in the local global configuration file being read at
+	the current point. I.e. it may well over-ride settings which
+	appeared before this line in the user's config file.
+	This should be the first thing in your file, if you're gonna use it.
+	Suggested by John F. Whitehead <jfw@wral-tv.com>.
+
+    *	ReadConfigFile() now warns about illegal syntax in the config file.
+	Previously it would be silently ignored.
+
+    *	Changed GetConfigFile() to ReadConfigFile(), which takes a filename
+	which should be interpreted as a weblint configuration file.
+	If WEBLINTRC is not set, and the user doesn't have a .weblintrc,
+	then weblint will now check $GLOBAL_RCFILE.
+
+    8-march-1996 neilb
+
+    *	Weblint now lets you have empty TD elements in a table.
+	Testcase in the testsuite for this.
+
+    24-february-1996 neilb
+
+    *	Fixed a typo in the manpage, the "malformed heading" warning was
+	included as the "malformed header" warning.
+	Reported by David J. MacKenzie <djm@va.pubnix.com>
+
+    14-february-1996 neilb
+
+    *	In the SEE ALSO section of the manpage, the .BR macro is used for
+	references.
+	Patch from Erick Branderhorst <branderhorst@fgg.eur.nl>
+
