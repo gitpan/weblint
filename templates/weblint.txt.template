@@ -1,0 +1,16 @@
+=========================================================================
+{"$name $version"} report, generated { scalar localtime }
+template version: $Revision: 1.1 $
+
+URL                 { $url }
+Download time       { $download_time }
+MIME type           { $type }
+MD5                 { $fetched_md5 }
+Total Download Size { $total_download_size }
+Link count          { $link_count }
+
+Lint Warnings
+------------------
+{ join  "\n", @lint_errors }
+
+=========================================================================

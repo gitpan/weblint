@@ -1,0 +1,8 @@
+LINT
+VERBOSITY 2
+MD5 9ec29ae8d1268b82acb8e3ab7ce0f5c6
+TIMER
+DOWNLOAD_SIZE
+REPORT templates/weblint.txt.template
+CHECK_LINKS
+DIFF test_files/response.html

@@ -1,0 +1,1146 @@
+#!/usr/bin/perl
+# $Id: weblint++,v 1.14 2002/12/12 19:56:28 comdog Exp $
+use strict;
+
+use HTML::Lint;
+
+=head1 NAME
+
+weblint++
+
+=head1 SYNOPSIS
+
+	weblint++ [-c] [-e] [-E] [-f] [-l] [-M] [-t] [-T] [-V]
+		[-C [config] ] [-d file] [-m [md5 digest] ] [-R template]
+		[-s file] [-u username -p password] [-v [level | 1] ]
+		url
+
+	weblint++ -h
+
+NOTE:  You will not see any output without the -v switch
+
+=head1 DESCRIPTION
+
+The C<weblint++> program fetches a web resource and runs the
+response through an HTML lint filter as well as other tests.
+
+You can use this program interactively if you specify the
+C<-v> switch, or use it in batch mode by observing the
+exit status.
+
+=head1 OPTIONS
+
+Command line switches cannot be grouped.  You must specify them
+separately.  If you do it correctly, things will work.
+
+	-l -T -m        CORRECT
+
+If you do it incorrectly, you get undefined behaviour.
+
+	-ltm            WRONG BAD BAD INCORRECT NAUGHTY
+
+=over 4
+
+=item -c
+
+The C<-c> switch checks IMG and A links if C<url> returns a 'text/html'
+resource. Each problem link adds 1 to the exit status value. With the
+C<-v> switch, C<-c> reports the status of just the status of bad links.
+The status of all links is available to the C<-R> template.
+
+=item -C [ config ]
+
+The C<-C> switch loads configuration information from a file.  If
+you do not specify a file then the program looks in the current
+directory for a file named .weblintrc.  If it does not find that
+file, it looks in your home directory.
+
+See the Configuration section for details on allowed directives.
+
+This switch requires C<ConfigReader::Simple>.
+
+=item -d file
+
+The C<-d> switch performs a diff between the HTTP response message body
+and the specified file.  The program exits if they differ, unless C<-e>
+is present.
+
+=item -e
+
+When present, the C<-e> switch prevents the program from exiting from
+errors with the C<-d> or C<-m> switches.  This way the program can
+continue and eventually print a report with the C<-R> switch.
+
+=item -E
+
+When present, the C<-e> switch prevents the program from creating
+reports unless it has web problems to report.
+
+=item -f file
+
+Read the resources to check from C<file> instead of from the command
+line.
+
+This functionality is unimplemented.
+
+=item -h
+
+Print a help message and exit.
+
+=item -l
+
+Run the contents of C<url>, if it is 'text/html' through C<HTML::Lint>.
+Each lint warning adds 1 to the exit status value. With the C<-v> switch,
+it prints the results to standard output.
+
+The test will be skipped if C<HTML::Lint> cannot be loaded.
+
+=item -m [md5 digest]
+
+The C<-m> switch by itself reports the MD5 digest (in hex) of the message
+body of the request from URL.  The program exits if the digests do not
+match, unless C<-e> is present.
+
+The test will be skipped if C<Digest::MD5> cannot be loaded.
+
+=item -M
+
+Email the report (from C<-R>).  You should specify the mail headers in
+the template, including the To: header.  The report will not be printed
+to standard output.
+
+This functionality is unimplemented.
+
+=item -p password
+
+The C<-p> switch specifies the Basic authentication password.
+
+=item -R file
+
+The C<-R> switch specifies the report template file.  Once the program
+fills in the template, it prints it to standard output unless you
+specified the C<-M> switch to email the report instead. It uses
+C<Text::Template>, and skips the report if that module is not available.
+
+The report will be skipped if C<Text::Template> cannot be loaded, unless
+C<Data::Dumper> can dump the report data structure to STDOUT.
+
+=item -s file
+
+The C<-s> switch specifies the file to save the HTTP message body to.
+
+=item -t
+
+The C<-t> switch reports the download time of the resource, using
+C<Time::HiRes>.
+
+The test will be skipped if C<Time::HiRes> cannot be loaded.
+
+=item -T
+
+The C<-T> switch reports the total download size of the resource. For
+'text/html' resources, this size includes the sizes of the IMG links.
+
+The test will be skipped if C<HTTP::Size> cannot be loaded.
+
+=item -u username
+
+The C<-u> switch specifies the Basic authentication user name.
+
+=item -v [level]
+
+The C<-v> switch turns on verbose reporting.  The greater the
+value of C<level>, the more verbose the reporting.  If you do
+not specify C<-v>, you will see no output, although you can
+observe the results from the exit status.
+
+The C<-v> switch implies C<-t>.
+
+=item -V
+
+Print the version number and exit.
+
+=back
+
+=head1 CONFIGURATION
+
+You can load configuration information from a file with the
+C<-C> switch.  Configuration directives found in the file
+override those found on the command line.  Some directives
+must have a value, some may take a value, and others set
+flags by their mere presence.
+
+=head2 Configuration directives
+
+=over 4
+
+=item VERBOSITY [ level ]
+
+Same as the C<-v> switch.
+
+=item USERNAME username
+
+Same as the C<-u> switch.
+
+=item PASSWORD password
+
+Same as the C<-p> switch.
+
+=item CHECK_LINKS
+
+Same as the C<-l> switch.
+
+=item DIFF file
+
+Same as the C<-d> switch.
+
+=item DO_NOT_EXIT
+
+Same as the C<-e> switch.
+
+=item LINKS_FILE file
+
+Same as the C<-f> switch.
+
+=item LINT
+
+Same as the C<-l> switch.
+
+=item MD5 [ md5 ]
+
+Same as the C<-m> switch.
+
+=item MAIL_REPORT
+
+Same as the C<-M> switch.
+
+=item MAIL_PROGRAM
+
+The mail program to use to send mail, such as
+/usr/lib/sendmail or /usr/local/bin/qmail-inject.
+The program name must exist and must be executable.
+The template must contain all of the headers. If
+you do not specify this directive, then the program
+attempts to use C<Mail::Sendmail>.
+
+=item MAIL_TO
+
+Sets the To address of the emailed report.
+
+This directive is ignored unless the C<-M> and C<-R> switches
+are used.
+
+=item MAIL_FROM
+
+Sets the From address of the emailed report.
+
+This directive is ignored unless the C<-M> and C<-R> switches
+are used.
+
+=item MAIL_SUBJECT
+
+Sets the subject line of the emailed report.
+
+This directive is ignored unless the C<-M> and C<-R> switches
+are used.
+
+=item REPORT_ON_ERROR_ONLY
+
+Reports will only be made if there was an error.  If
+no problems were found with the resource, then nothing
+will be printed to standard output or mailed.
+
+Same as the C<-E> switch.
+
+=item REPORT template
+
+Same as the C<-R> switch.
+
+=item SAVE_RESPONSE file
+
+Same as the C<-s> switch.
+
+=item TIMER
+
+Same as the C<-t> switch.
+
+=item DOWNLOAD_SIZE
+
+Same as the C<-T> switch.
+
+=back
+
+=head1 ORDER OF TESTS
+
+The program performs the tests, and possibly exits based on
+errors, in this order:
+
+	HTTP fetch
+	time download ( C<-t> switch )
+	MD5 digest comparison ( C<-m> switch )
+	File content comparison ( C<-d> switch )
+	Download size check (C<-T> switch)
+	HTML Lint warnings (C<-l> switch )
+	Link Check (C<-c> switch )
+
+=head1 REPORT TEMPLATES
+
+The C<-R> switch allows you to generate a report from your own
+template.
+
+These variables are available:
+
+=over 4
+
+=item	$url
+
+The value of C<url> from the command line.
+
+=item	%options
+
+A hash of all of the specified switches, and their values.
+A value of C<1> indicates either the literal value is C<1>
+or the switch was specified without a value.
+
+=item	$name
+
+The program name, as reported in $0.  You can also simply
+use $0.
+
+=item	$version
+
+The program version number
+
+=item	$request
+
+The HTTP request, from C<HTTP::Request>
+
+=item	$response
+
+The HTTP response, from C<HTTP::Response>
+
+=item	$response_code
+
+The HTTP response status code, from C<HTTP::Response>
+
+=item	$response_success
+
+True if the request was successful, from C<HTTP::Response>
+
+=item	$download_time
+
+The download time of C<url>.
+
+=item	$data
+
+The message body of the HTTP response.
+
+=item	$type
+
+The content-type of the HTTP response.  Some tests only
+work for the 'text/html' MIME type.
+
+=item	$fetched_md5
+
+The MD5 digest of the message body of the HTTP response.
+The C<-m> switch compares its value, C<$options{m}>, to
+this value.
+
+This applies to the C<-m> switch only, and is not set
+otherwise.
+
+=item	$md5_mismatch
+
+True if the MD5 digest of the message body of the HTTP response
+does not match the value specified with the C<-m> switch.
+
+This applies to the C<-m> switch only, and is not set
+otherwise.
+
+=item	$diff
+
+The text differences between the message body of the HTTP
+response and the filel specified with the C<-d> switch.
+
+This applies to the C<-d> switch only, and is not set
+otherwise.
+
+=item	$total_download_size
+
+The total download size of C<url>, along with image file
+sizes it includes, as determined by C<HTTP::Size>.
+
+This applies to the C<-T> switch only, and is not set
+otherwise.
+
+=item	%total_download_hash
+
+The hash from C<HTTP::Size::get_sizes>.  See that module
+for details.
+
+This applies to the C<-T> switch only, and is not set
+otherwise.
+
+=item	$lint_error_count
+
+The number or warnings reported by C<HTML::Lint>.
+
+This applies to the C<-l> switch only, and is not set
+otherwise.
+
+=item	@lint_errors
+
+The warnings reported by C<HTML::Lint>.
+
+This applies to the C<-l> switch only, and is not set
+otherwise.
+
+=item	@links
+
+The links extracted from the message body of the HTTP
+response, reported by C<HTML::SimpleLinkExtor>.
+
+This applies to the C<-c> switch only, and is not set
+otherwise.
+
+=item	$link_count
+
+The number of links extracted from the message body of the HTTP
+response, reported by C<HTML::SimpleLinkExtor>.
+
+This applies to the C<-c> switch only, and is not set
+otherwise.
+
+=item	%unique_links
+
+The unique links extracted from the message body of the HTTP
+response, reported by C<HTML::SimpleLinkExtor>, as the keys
+to this hash.  Their values are the HTTP response code for
+each link.
+
+This applies to the C<-c> switch only, and is not set
+otherwise.
+
+=item	$unique_link_count
+
+The number of unique links extracted from the message body of the HTTP
+response, reported by C<HTML::SimpleLinkExtor>.
+
+This applies to the C<-c> switch only, and is not set otherwise.
+
+=item	$link_errors
+
+The number of unique links from the message body of the HTTP
+response which returned HTTP error statuses (4xx, 5xx).
+
+This applies to the C<-c> switch only, and is not set
+otherwise.
+
+=item	$errors
+
+The total number of lint warnings and HTTP errors from link
+checking.
+
+This applies to the C<-c> and C<-l> switches only, and is not set
+otherwise.
+
+=item	@error_messages
+
+An array of error messages from all parts of the program, in the
+order that the program encountered them.
+
+=back
+
+=head1 EXIT STATUSES
+
+=over 4
+
+=item -1
+
+The MD5 digest of the HTTP response message body did not match the digest
+specified with C<-m>, if you specified one.
+
+=item -2
+
+The file specified with the C<-d> switch does not exist.
+
+=item -3
+
+The HTTP response message body differed from the content of the file
+specified with <-d>.
+
+=item < 0
+
+The program encountered HTTP error.  The exit code is the HTTP response
+code negated.  If the HTTP response was 404 (Not Found), the exit status
+is -404.
+
+=item > 0
+
+C<HTML::Lint> found HTML errors.  The exit status is the number of HTML
+errors (from C<-l>) and broken links (from C<-c>).
+
+=item +0
+
+Success.  No HTTP errors, no MD5 digest mismatches, no file diffs, no HTML
+warnings.
+
+=back
+
+=head1 EXAMPLES
+
+=head2 Check for HTML errors
+
+These commands interactively check HTML for errors.
+The C<-v> switch prints results to the terminal and
+the C<-l> switch loads C<HTML::Lint>.
+
+	# from the web
+	weblint++ -v -l http://www.example.com
+
+	# a local file with an absolute path
+	weblint++ -v -l /usr/local/web/test.html
+
+	# a local file with a absolute file: URI
+	weblint++ -v -l file:/usr/local/web/test.html
+
+	# a local file with a relative URI
+	weblint++ -v -l test.html
+
+	# a local file with a relative file: URI
+	weblint++ -v -l file:test.html
+
+=head2 Check for bad HTML anchors and image links
+
+This command check for broken links.  You can use
+the same form of the URIs in C<Check for HTML errors>.
+The C<-v> switch prints results to the terminal and
+the C<-c> switch loads C<HTTP::SimpleLinkChecker>.
+
+	# from the web
+	weblint++ -v -c http://www.example.com
+
+=head2 Get the MD5 digest of a web resource
+
+These command check MD5 digests.  You can use
+the same form of the URIs in C<Check for HTML errors>.
+The C<-v> switch prints results to the terminal and
+the C<-M> switch loads C<Digest::MD5>.
+
+	# get MD5 digest
+	weblint++ -v -m http://www.example.com
+
+	# compare MD5 digest
+	weblint++ -v -m9ec29ae8d1268b82acb8e3ab7ce0f5c6 http://www.example.com
+
+=head2 Get the file contents
+
+This command checks for content differences.  You can use
+the same form of the URIs in C<Check for HTML errors>.
+The C<-v> switch prints results to the terminal and
+the C<-d> switch loads C<Text::Diff>.
+
+	weblint++ -v -d should_be/test.html http://www.example.com
+
+=head2 Read a configuration file
+
+	weblint++ -C .configrc http://www.example.com
+
+=head2 Access a password protected website
+
+This command accesses a password protected website
+with the Basic authentication username and password.
+
+	weblint++ -v -u username -p password http://www.example.com
+
+=head2 Print a report using a template file
+
+This command check for broken links.  You can use
+the same form of the URIs in C<Check for HTML errors>.
+The C<-v> switch prints results to the terminal and
+the C<-R> switch loads C<Text::Template> and populates
+C<template.txt>.  The program prints the results to
+STDOUT.
+
+	# print the report despite results
+	weblint++ -R template.txt -l http://www.example.com
+
+The C<-E> switch only prints reports if the program
+needs to report a problem with the resource.  The
+program will not print a report if it did not find
+a problem with the resource.  For example, you might
+use this as a cron job.  If something needs your attention,
+the program prints the report to standard output which
+cron then mails to you.  If everything is okay, you
+do not get mail.
+
+	# print the result only if there were HTML errors
+	weblint++ -E -R template.txt -l http://www.example.com
+
+	# print the result only if there were HTML errors
+	# or bad link problems
+	weblint++ -E -R template.txt -l -c http://www.example.com
+
+=head2 Save the HTTP response in a file
+
+This command saves the HTTP message body.  You can use
+the same form of the URIs in C<Check for HTML errors>.
+The C<-s> switch saves the results in C<saved.txt>.
+
+	weblint++ -s saved.txt http://www.example.com
+
+=head2 Time the download
+
+This command measures the download time of
+C<http://www.example.com>.  You can use the same form of the
+URIs in C<Check for HTML errors>. The C<-v> switch prints
+results to the terminal and the C<-t> switch loads
+C<Time::HiRes>.
+
+	weblint++ -v -t http://www.example.com
+
+=head2 Measure the total download size, including linked images
+
+This command measures the download time of
+C<http://www.example.com>.  You can use the same form of the
+URIs in C<Check for HTML errors>. The C<-v> switch prints
+results to the terminal and the C<-T> switch loads
+C<HTTP::Size>.
+
+	weblint++ -v -T http://www.example.com
+
+=head2 Perform all tests
+
+	# print to the terminal
+	weblint++ -v -c -l -t -m -T -d test.html http://www.example.com
+
+	# print to a template
+	weblint++ -v -c -l -t -m -T -R template.txt http://www.example.com
+
+=head1 BUGS
+
+* to be determined
+
+=head1 TO DO
+
+* test various HTTP header things (cookies, etc)
+
+* email templates on error
+
+* implement -M
+
+* implement -f
+
+* allow global configuration files.
+
+* reconsider exiting on errors from -d and -m
+
+* exiting with negative error codes is probably not such a great
+idea.  maybe -e should allow the exit rather than the other way
+around.
+
+=head1 SOURCE AVAILABILITY
+
+This source is part of a SourceForge project which always has the
+latest sources in CVS, as well as all of the previous releases.
+
+	https://sourceforge.net/projects/brian-d-foy/
+
+If, for some reason, I disappear from the world, one of the other
+members of the project can shepherd this module appropriately.
+cvs comm
+=head1 AUTHOR
+
+brian d foy E<lt>bdfoy@cpan.orgE<gt>
+
+=head1 COPYRIGHT
+
+Copyright 2002, brian d foy.  All rights reserved.
+
+This program may be redistributed under the same turns as Perl
+itself.
+
+=head1 SCRIPT CATEGORIES
+
+Web
+
+=head1 SEE ALSO
+
+L<HTML::Lint>, L<Text::Diff>, L<HTTP::Request>, L<HTTP::Response>,
+L<Time::HiRes>, L<Text::Template>, L<HTTP::Size>
+
+=cut
+
+use vars qw( %opts $report );
+
+require 5.6.0;
+require LWP::UserAgent;
+require HTTP::Request;
+require URI;
+
+use constant SUCCESS                =>  0;
+use constant MD5_DIGEST_MISMATCH    => -1;
+use constant FILE_DOES_NOT_EXIST    => -2;
+use constant FILE_CONTENTS_MISMATCH => -3;
+
+unless( $ARGV[-1] eq '-h' or $ARGV[-1] eq '-V' )
+	{
+	my $last_arg = pop @ARGV;
+	my $url = URI->new( $last_arg );
+
+	# if we didn't see a scheme, assume we're looking
+	# at a file, so let's make it an absolute URL.
+	unless( $url->scheme )
+		{
+		require URI::file;
+		$url = URI::file->new_abs( $last_arg );
+		print "relative URL is now ", $url->canonical, "\n";
+		}
+
+	$report->{url} = $url->canonical;
+	}
+
+$report->{name}    = $0;
+$report->{version} =
+	sprintf "%d.%02d", q$Revision: 1.14 $ =~ m/(\d+) \. (\d+)/xg;
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# command line argument processing
+while( my $arg = shift @ARGV )
+	{
+	unless( $arg =~ m/^-(.)/ )
+		{
+		shift @ARGV;
+		next;
+		}
+
+	my $letter = $1;
+
+	if( not @ARGV or $ARGV[0] =~ m/^-/ )
+		{
+		$opts{$letter} = 1;
+		next;
+		}
+
+	$opts{$letter} = shift @ARGV;
+	}
+
+$opts{v} || 0;
+
+if( exists $opts{h} and $opts{h} )
+	{
+	print <<"HERE";
+
+-------- USAGE -----------------------------------------------------
+	$0 [ options ] url
+-------- OPTIONS ---------------------------------------------------
+-c               # check anchor and image links
+-C [ file ]      # load this configuration file, or use the default
+-d file          # perform a text diff with this file
+-e               # do not exit on MD5 digest of text diff errors
+-E               # do not make report unless there is an error
+-f file          # take URLs from this file
+-h               # print this message
+-l               # check for HTML errors
+-m [ digest ]    # compute the MD5 digest, or compare them
+-M               # email report
+-p password      # basic authentication password
+-R               # make a report
+-s file          # save response in file
+-t               # time download
+-T               # measure total download size
+-u username      # basic authentication username
+-v [ level ]     # give verbose output
+-V               # print the version number
+--------------------------------------------------------------------
+Copyright 2002, brian d foy <bdfoy\@cpan.org>
+HERE
+
+	exit 0;
+	}
+elsif( exists $opts{V} and $opts{V} )
+	{
+	print "This is $0 version $$report{version}\n";
+
+	exit 0;
+	}
+
+$report->{command_line_options} = \%opts;
+
+if( $opts{v} > 1 )
+	{
+	print "---- Command line options --------\n";
+	foreach my $opt ( sort { lc $a eq lc $b or $a cmp $b } keys %opts )
+		{
+		print "OPTION $opt => $opts{$opt}\n";
+		}
+	print "----------------------------------\n";
+	}
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# # # load configuration file
+
+# # # use a default file name if we did not specify
+# # # one.
+if( exists $opts{'C'} )
+	{
+	if( $opts{'C'} eq '1' )
+		{
+		require File::Spec;
+		require File::Basename;
+
+		my $basename = File::Basename::basename( $0 );
+
+		my $file = ".$basename.rc";
+
+		$opts{'C'} = do {
+			if( -r $file )
+				{
+				$file
+				}
+			elsif( -r File::Spec->catfile( $ENV{HOME}, $file ) )
+				{
+				File::Spec->catfile( $ENV{HOME}, $file )
+				}
+			else { undef };
+			};
+		}
+
+	# # # can we load the file?
+	if( -r $opts{'C'} and eval { require ConfigReader::Simple } )
+		{
+		my $config = ConfigReader::Simple->new( $opts{'C'} );
+
+		# XXX: replace opts
+		my %directives = qw(LINT l VERBOSITY v USERNAME u PASSWORD p
+			CHECK_LINKS c DIFF d LINKS_FILE f MD5 m MAIL_REPORT M
+			REPORT_ON_ERROR_ONLY E REPORT R SAVE_RESPONSE s
+			TIMER t DOWNLOAD_SIZE T);
+		foreach my $directive ( keys %directives )
+			{
+			next unless $config->exists( $directive );
+
+			print "Found [$directive] in config file [$opts{C}]\n"
+				if $opts{v} > 1;
+
+			$opts{ $directives{ $directive } } = $config->$directive || 1;
+			}
+
+		}
+	elsif( not -r $opts{'C'} )
+		{
+		error( "Skipping configuration file. Could not load [$opts{'C'}]\n" );
+		}
+	elsif( $@ =~ m|(ConfigReader/Simple)| )
+		{
+		error( "Skipping configuration file. Could not load $1\n", $@ );
+		}
+	}
+
+if( $opts{v} > 1 )
+	{
+	print "---- Config options --------------\n";
+	foreach my $opt ( sort { lc $a eq lc $b or $a cmp $b } keys %opts )
+		{
+		print "OPTION $opt => $opts{$opt}\n";
+		}
+	print "----------------------------------\n";
+	}
+
+# finally, record the options
+$report->{options} = \%opts;
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# HTTP objects
+my $user_agent = LWP::UserAgent->new;
+my $request    = HTTP::Request->new( GET => $report->{url} );
+
+$request->authorization_basic( $opts{u}, $opts{p} )
+	if( exists $opts{u} and exists $opts{p} );
+
+print $request->as_string if $opts{'v'} > 2;
+
+$report->{request} = $request->as_string;
+
+my $response = do {
+	if( exists $opts{'t'} and $opts{'t'}
+		and eval { require Time::HiRes } )
+		{
+		my $t0 = [ Time::HiRes::gettimeofday() ];
+		my $response = $user_agent->request( $request );
+		$report->{download_time} = sprintf "%.3f seconds",
+		Time::HiRes::tv_interval( $t0, [ Time::HiRes::gettimeofday() ]);
+		print $report->{download_time}, "\n" if( $opts{t} or $opts{'v'} );
+		$response;
+		}
+	else
+		{
+		error( "Skipping -t test. Could not load $1\n", $@ )
+			if $@ =~ m|(Time/HiRes)|;
+		$user_agent->request( $request );
+		}
+	};
+
+$report->{reponse}          = $response->as_string;
+$report->{response_status}  = $response->code;
+$report->{response_success} = $response->is_success;
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# the tests
+if( $response->is_success )
+	{
+	print $response->as_string if $opts{'v'} > 2;
+	my $content     = $response->content;
+	$report->{data} = \$content;
+
+	# some tests only work on text/html
+	$report->{type} = lc $response->content_type;
+
+	# # # save the data
+	if( exists $opts{'s'} and $opts{'s'} ne '1' )
+		{
+		if( open(FILE, "> $opts{'s'}") )
+			{
+			print FILE ${$report->{data}};
+			close FILE;
+			}
+		else
+			{
+			error( "Could not open $opts{s} for writing: $!\n" );
+			}
+		}
+
+	# # # MD5 differences
+	if( exists $opts{'m'} and $opts{'m'} and eval { require Digest::MD5 } )
+		{
+		$report->{fetched_md5} =
+			Digest::MD5::md5_hex( ${$report->{data}} );
+		print "MD5 digest (hex) $$report{fetched_md5}\n"
+			if( exists $opts{'m'} and $opts{'v'} );
+
+		if( $opts{'m'} ne 1 and $opts{'m'} ne $report->{fetched_md5} )
+			{
+			$report->{md5_mismatch} = 1;
+			error( "MD5 digests do not match!\n" .
+				"Expected [$opts{m}] got [$$report{fetched_md5}]\n" );
+			exit MD5_DIGEST_MISMATCH unless $opts{'e'};
+			}
+		}
+	elsif( $@ =~ m|(Digest/MD5)| )
+		{
+		error( "Skipping -m test. Could not load $1\n", $@ );
+		}
+
+	# # # File differences
+	if( exists $opts{'d'} and $opts{'d'} and -e $opts{'d'}
+		and $report->{type} =~ /^text/
+		and eval { require Text::Diff } )
+		{
+		$report->{diff} = Text::Diff::diff( $opts{'d'}, $report->{data} );
+
+		unless( $report->{diff} eq '0' )
+			{
+			print "Files are different\n$$report{diff}\n" if $opts{'v'};
+			exit FILE_DOES_NOT_EXIST unless $opts{'e'};
+			}
+
+		print "Response is same as $opts{d}\n" if $opts{'v'};
+		}
+	elsif( $@ =~ m|(Text/Diff)| )
+		{
+		error( "Skipping -d test. Could not load $1\n", $@ );
+		}
+	elsif( exists $opts{'d'} and $opts{'d'} and not -e $opts{'d'} )
+		{
+		error( "File $opts{'d'} does not exist\n" );
+
+		exit FILE_CONTENTS_MISMATCH unless $opts{'e'};
+		}
+	elsif( $report->{type} !~ /^text/ )
+		{
+		error( "Skipping -d test.  Content is not text " .
+			"[$$report{type}]" );
+		}
+
+	# # # get the total download size
+	if( exists $opts{'T'} and $opts{'T'} and eval { require HTTP::Size } )
+		{
+		@{$report}{ qw(total_download_size total_download_hash) }
+			= HTTP::Size::get_sizes( $report->{url} );
+		my $count = keys %{$report->{total_download_hash}};
+
+		if( defined $report->{total_download_size} )
+			{
+			print "Total Download size for $count files: ".
+				"$$report{total_download_size}\n" if $opts{'v'};
+			}
+		else
+			{
+			error("Error getting total download size!\n");
+			}
+		}
+	elsif( $@ =~ m|HTTP/Size| )
+		{
+		error( "Skipping -T test. Could not load HTTP::Size\n", $@ );
+		}
+
+	# # # Lint
+	if( exists $opts{'l'} and $opts{'l'} and eval { require HTML::Lint }
+		and $report->{type} eq 'text/html')
+		{
+		my $lint = HTML::Lint->new();
+
+		$lint->parse( ${$report->{data}} );
+
+		$report->{lint_error_count} =   $lint->errors();
+		$report->{errors}           =   $lint->errors();
+		$report->{lint_errors}      =
+			[ map { $_->as_string } $lint->errors() ];
+
+		if( $opts{'v'} )
+			{
+			foreach my $error ( $lint->errors() )
+				{
+				print $error->as_string(), "\n";
+				}
+			}
+
+		$lint->errors();
+		}
+	elsif( $@ =~ m|HTML/Lint| )
+		{
+		error( "Skipping -l test. Could not load HTML::Lint\n", $@ );
+		}
+	elsif( $report->{type} ne 'text/html' )
+		{
+		error( "Skipping -l test. " .
+			"Content is not HTML [$$report{type}]\n" );
+		}
+
+	# # # Check links
+	if( exists $opts{'c'} and $opts{'c'}
+		and $report->{type} eq 'text/html'
+		and eval { require HTTP::SimpleLinkChecker }
+		and eval { require HTML::SimpleLinkExtor } )
+		{
+		print "Checking links\n" if $opts{'v'};
+
+		$report->{links} = [ HTML::SimpleLinkExtor->new(
+			$report->{url} )->parse(
+				${$report->{data}} )->links ];
+
+		$report->{link_count} = @{ $report->{links} };
+
+		print "Found $$report{link_count} links -- " if $opts{'v'};
+
+		my %links = map { $_, 1 } @{$report->{links}};
+
+		$report->{unique_links}      = \%links;
+		$report->{unique_link_count} = keys %links;
+
+		print keys( %links ) . " are unique\n" if $opts{'v'};
+
+		foreach my $link ( sort keys %links )
+			{
+			my $code = HTTP::SimpleLinkChecker::check_link( $link );
+			$report->{unique_links}{$link} = $code;
+			$report->{link_errors}++ if $code >= 400;
+
+			next unless $opts{'v'} or $code >= 400;
+
+			print "$code $link\n";
+			}
+
+		print "Completed link checks\n" if $opts{'v'};
+		my $plural = '';
+		$plural = 's' unless $report->{link_errors} == 1;
+		print "$$report{link_errors} link$plural returned a bad status\n"
+			if( $opts{'v'} and $report->{link_errors} );
+		$report->{errors} += $report->{link_errors};
+		}
+	elsif( $@ =~ m|(HTTP/SimpleLinkChecker)|
+		or $@ =~ m|(HTML/SimpleLinkExtor)| )
+		{
+		error( "Skipping -c test. Could not load $1\n", $@ );
+		}
+
+	# # # time to make report
+	unless( $opts{'E'} and not $report->{errors} )
+		{
+		if( exists $opts{'R'} and $opts{'R'} ne '1' and -r $opts{'R'}
+			and eval { require Text::Template } )
+			{
+			my $template = Text::Template->new( TYPE => 'FILE',
+				SOURCE => $opts{'R'} );
+
+			my $report = $template->fill_in( HASH => $report );
+
+			if( exists $opts{'M'} )
+				{
+				if( exists $opts{'mailer'} and -x $opts{'mailer'} )
+					{
+					open MAIL, "| $opts{mailer}";
+					print MAIL $report;
+					close MAIL;
+					}
+				elsif( eval { require Mail::Sendmail } )
+					{
+					my %mail = ( To      => $opts{mail_to},
+								 From    => $opts{mail_from},
+								 Subject => $opts{mail_subject},
+								 Message => $report,
+								);
+					Mail::Sendmail::sendmail( %mail );
+
+					print STDERR "$0: Could not send mail: "
+								. "$Mail::Sendmail::error\n"
+								. $report if $Mail::Sendmail::error;
+					}
+				elsif( $@ =~ m|(Mail/Sendmail)| )
+					{
+					error( "Skipping -M report. Could not load $1\n", $@ );
+					}
+				}
+			else
+				{
+				print STDOUT $report;
+				}
+			}
+		elsif( $@ =~ m|(Text/Template)| )
+			{
+			error( "Skipping -R test. Could not load $1\n", $@ );
+			}
+		elsif( exists $opts{'R'} and $opts{'R'} ne '1' )
+			{
+			error( "Skipping -R test. Could not load $opts{'R'}\n", $! );
+
+			if( $opts{'v'} and eval { require Data::Dumper } )
+				{
+				print Data::Dumper::Dumper( $report );
+				}
+			}
+		}
+
+	# # # time to go away
+	exit SUCCESS unless $report->{errors};
+
+	exit $report->{errors};
+	}
+else
+	{
+	my $url = $report->{url};
+	print STDOUT "Could not fetch $url [",
+		$response->code, "]" if $opts{'v'} or $opts{'R'};
+
+	exit -( $response->code );
+	}
+
+sub error
+	{
+	my $message = shift;
+	my $error   = shift;
+
+	push @{ $report->{error_messages} }, $message;
+
+	print STDERR $message, "\n", $error, "\n" if $opts{'v'};
+	}

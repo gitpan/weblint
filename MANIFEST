@@ -1,0 +1,15 @@
+Changes
+MANIFEST
+Makefile.PL
+config/all.rc
+config/weblint.rc
+html/202.html
+html/good.html
+html/perl_ad.png
+html/test.html
+t/compile.t
+t/pod.t
+t/test_manifest
+templates/weblint.txt.template
+test_files/response.html
+weblint++
