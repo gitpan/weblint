@@ -14,7 +14,7 @@
 #	ftp://ftp.cre.canon.co.uk/pub/weblint/weblint.tar.gz
 #
 
-$VERSION        = '1.019';
+$VERSION        = '1.020';
 ($PROGRAM       = $0) =~ s@.*/@@;
 @TMPDIR_OPTIONS	= ('/usr/tmp', '/tmp', '/var/tmp', '/temp');
 $TMPDIR         = &PickTmpdir(@TMPDIR_OPTIONS);
@@ -56,7 +56,7 @@ $usage=<<EofUsage;
       -urlget       : specify the command used to get a URL
       -version | -v : display version
       -warnings     : list supported warnings
-      -x <extn>     : HTML extension to include (supported: Java, Netscape)
+      -x <extn>     : HTML extension to use (supported: Microsoft, Netscape)
 
   To check one or more HTML files, run weblint thusly:
       weblint file1.html [... fileN.html]
@@ -78,7 +78,7 @@ EofToDo
 # obsolete tags
 $obsoleteTags = 'PLAINTEXT|XMP|LISTING';
 
-$maybePaired  = 'LI|DT|DD|P|TD|TH|TR';
+$maybePaired  = 'LI|DT|DD|P|TD|TH|TR|OPTION';
 
 $pairElements = 'A|ADDRESS|APPLET|HTML|HEAD|BIG|BLOCKQUOTE|BODY|CAPTION|DIV|'.
                 'H1|H2|H3|H4|H5|H6|CENTER|FONT|MAP|FONT|'.
@@ -515,13 +515,13 @@ die "$usage" unless @ARGV > 0;
 # escape the `-' command-line switch (for stdin), so NGetOpt don't mess wi' it
 grep(s/^-$/\tstdin\t/, @ARGV);
 
-&NGetOpt(@options) || die "use -U switch to display usage statement\n";
+&NGetOpt(@options) || die "use -help switch to display usage statement\n";
 
 # put back the `-' command-line switch, if it was there
 grep(s/^\tstdin\t$/-/, @ARGV);
 
 die "$versionString\n"	if $opt_v || $opt_version;
-die "$usage"		if $opt_u || $opt_help;
+die "$usage"		if $opt_U || $opt_help;
 
 &ReadDefaults();
 
@@ -1646,7 +1646,7 @@ sub wanted
       }
    }
 
-   /\.($fileExtensions)$/ &&   	# valid filename extensions: .html .htm
+   /\.($fileExtensions)$/o &&   # valid filename extensions: .html .htm
       -f $_ &&			# only looking for files
       (!$opt_l || !-l $_) &&	# ignore symlinks if -l given
       &WebLint($_,$name);	# check the file

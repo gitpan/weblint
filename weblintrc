@@ -1,6 +1,6 @@
 #
 # sample configuration file for weblint
-# distributed as part of weblint 1.019
+# distributed as part of weblint 1.020
 #
 # The settings in this file reflect the built-in defaults.
 # I.e. if a warning is enabled in this file, then it is enabled by
@@ -399,8 +399,8 @@ enable quote-attribute-value
 
 
 # ========================================================================
-# New stuff in the 1.019 release
+# New stuff in the 1.020 release
 # ========================================================================
 
-#-- no new warnings or variables added in 1.019
+#-- no new warnings or variables added in 1.020
 

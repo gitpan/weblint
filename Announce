@@ -1,18 +1,22 @@
 
-Weblint 1.019 is now available:
+Weblint 1.020 is now available:
 
         http://www.cre.canon.co.uk/~neilb/weblint/
-        ftp://ftp.cre.canon.co.uk/pub/weblint/weblint-1.019.tar.gz
-        ftp://ftp.cre.canon.co.uk/pub/weblint/weblint-1.019.zip
+        ftp://ftp.cre.canon.co.uk/pub/weblint/weblint-1.020.tar.gz
+        ftp://ftp.cre.canon.co.uk/pub/weblint/weblint-1.020.zip
 
 Weblint is a syntax and minimal style checker for HTML: a Perl script which
 picks fluff off HTML pages, much in the same way traditional lint picks fluff
 off C programs.
 
-This version was released to make an official version available with
-support for HTML 3.2 and the extensions from Microsoft (v4) & Netscape (v4).
-
-This is the last version which will support Perl 4. Modulo any serious bugs,
-the next version will be 2.0, which is a major rewrite, and requires Perl 5.
+There were a couple of small bugs reported with 1.019, fixed in this release.
 
 neilb
+
+    *	Weblint was incorrectly warning that OPTION is not a container element
+
+    *	The -U switch was no longer displayed the help screen.
+	The help screen was referred to the old "Java" extension.
+
+    *	Performance improvement when recursively checking files in a directory
+

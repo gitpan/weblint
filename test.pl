@@ -10,7 +10,7 @@
 # See README for additional blurb.
 # Bugs, comments, suggestions welcome: neilb@cre.canon.co.uk
 #
-$VERSION	= '1.011';
+$VERSION	= '1.012';
 ($PROGRAM = $0) =~ s@.*/@@;
 $FILENAME	= 'testfile.htm';
 $LOGFILE	= 'test.log';
@@ -1867,8 +1867,8 @@ FORM with Netscape JavaScript extensions
 <KEYGEN NAME=halt CHALLENGE="who goes there?">
 <SELECT NAME=Name MULTIPLE ONBLUR="blur()" ONCHANGE="change()"
         ONCLICK="click()" ONFOCUS="focus()" SIZE=2>
-    <OPTION VALUE="Bob" SELECTED>
-    <OPTION VALUE="Fred">
+    <OPTION VALUE="Bob" SELECTED>Bob
+    <OPTION VALUE="Fred">Fred
 </SELECT>
 <TEXTAREA COLS=50 NAME=textarea ONBLUR="blur()" ONCHANGE="change()"
           ONFOCUS="focus()" ONSELECT="select()" ROWS=4 WRAP=HARD>
@@ -2037,4 +2037,38 @@ Microsoft Anchor (A) usage
    ONKEYUP="foo()" ONMOUSEMOVE="move()" ONMOUSEOVER="over()"
    ONSELECTSTART="start()">foo</A>
 </BODY></HTML>
+#------------------------------------------------------------------------
+OPTION can have an optional closing tag
+<none>
+-x Microsoft
+-x Netscape
+####
+<HTML><HEAD><TITLE>foo</TITLE></HEAD>
+<BODY>
+<FORM ACTION="foo.pl" METHOD=POST>
+<SELECT NAME=COLOR>
+<OPTION VALUE=red>Red
+<OPTION VALUE=green>Green</OPTION>
+<OPTION VALUE=blue>Blue</OPTION>
+</SELECT>
+</FORM>
+</BODY></HTML>
+#------------------------------------------------------------------------
+Should now get a warning if you have an empty OPTION in a SELECT
+<none>
+-x Microsoft
+-x Netscape
+####
+<HTML><HEAD><TITLE>foo</TITLE></HEAD>
+<BODY>
+<FORM ACTION="foo.pl" METHOD=POST>
+<SELECT NAME=COLOR>
+<OPTION VALUE=red>
+<OPTION VALUE=green>Green</OPTION>
+<OPTION VALUE=blue>Blue</OPTION>
+</SELECT>
+</FORM>
+</BODY></HTML>
+####
+5:empty-container
 #------------------------------------------------------------------------

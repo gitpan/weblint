@@ -1,5 +1,5 @@
 
-			  Weblint, Version 1.019
+			  Weblint, Version 1.020
 
     Copyright (c) 1994, 1995, 1996, 1997 Neil Bowers.  All rights reserved.
 
@@ -66,8 +66,8 @@ A postscript version of the manpage (weblint.ps) is available at:
 
 Weblint is available via anonymous ftp, either as a gzip'd tar file,
 or zip'd archive:
-	ftp://ftp.cre.canon.co.uk/pub/weblint/weblint-1.019.tar.gz
-	ftp://ftp.cre.canon.co.uk/pub/weblint/weblint-1.019.zip
+	ftp://ftp.cre.canon.co.uk/pub/weblint/weblint-1.020.tar.gz
+	ftp://ftp.cre.canon.co.uk/pub/weblint/weblint-1.020.zip
 or you can get it from the weblint home page:
 	http://www.cre.canon.co.uk/~neilb/weblint/
 The home page also includes a list of other ftp sites where you
