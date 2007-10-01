@@ -1,2 +1,7 @@
-$Id: Changes,v 1.1 2002/12/12 19:50:23 comdog Exp $
+$Id: Changes 733 2002-12-12 20:02:14Z comdog $
+
+1.14 - Thu Dec 12 14:01:09 2002
+	* this is the first full distribution and release
+	* no code changes to the previous release, just a Makefile.PL
+	and all of the trimmings
 

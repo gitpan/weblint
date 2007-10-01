@@ -1,5 +1,5 @@
-# $Id: pod.t,v 1.1 2002/12/12 19:13:26 comdog Exp $
-
-use Test::Pod tests => 1;
-
-pod_ok('blib/script/weblint++');
+#$Id: pod.t 1342 2004-09-02 00:40:05Z comdog $
+use Test::More;
+eval "use Test::Pod 1.00";
+plan skip_all => "Test::Pod 1.00 required for testing POD" if $@;
+all_pod_files_ok();

@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# $Id: weblint++,v 1.14 2002/12/12 19:56:28 comdog Exp $
+# $Id: weblint++ 2318 2007-10-01 20:31:32Z comdog $
 use strict;
 
 use HTML::Lint;
@@ -649,13 +649,14 @@ latest sources in CVS, as well as all of the previous releases.
 If, for some reason, I disappear from the world, one of the other
 members of the project can shepherd this module appropriately.
 cvs comm
+
 =head1 AUTHOR
 
-brian d foy E<lt>bdfoy@cpan.orgE<gt>
+brian d foy C<< <bdfoy@cpan.org> >>
 
 =head1 COPYRIGHT
 
-Copyright 2002, brian d foy.  All rights reserved.
+Copyright 2002-2007, brian d foy.  All rights reserved.
 
 This program may be redistributed under the same turns as Perl
 itself.
@@ -701,8 +702,7 @@ unless( $ARGV[-1] eq '-h' or $ARGV[-1] eq '-V' )
 	}
 
 $report->{name}    = $0;
-$report->{version} =
-	sprintf "%d.%02d", q$Revision: 1.14 $ =~ m/(\d+) \. (\d+)/xg;
+$report->{version} = 1.15;
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # command line argument processing
